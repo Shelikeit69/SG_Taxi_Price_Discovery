@@ -1,5 +1,7 @@
 # SG Taxi Price Discovery
 
+**[🇨🇳 简体中文说明 → README.zh-CN.md](README.zh-CN.md)** | English
+
 A free, open-source reference fare for taxi rides in Singapore.
 
 Pick a starting MRT station and a destination station. The tool works out what the trip would cost on a street-hail taxi meter, using ComfortDelGro's published standard-taxi rates. Compare that number with the quote in your ride-hailing app and decide for yourself whether the difference is worth paying.
