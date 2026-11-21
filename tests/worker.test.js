@@ -44,3 +44,12 @@ test("uses a random UUID by default", async () => {
   );
   assert.match(rows[0][0], /^[0-9a-f-]{36}$/);
 });
+
+test("scheduled handler runs the rain job", async () => {
+  const worker = createWorker(data);
+  const waited = [];
+  const DB = { prepare: () => ({ bind: () => ({ all: async () => ({ results: [] }) }) }) };
+  worker.scheduled({}, { DB }, { waitUntil: (p) => waited.push(p) });
+  assert.equal(waited.length, 1);
+  assert.deepEqual(await waited[0], { checked: 0, updated: 0, noReading: 0, noStation: 0, failedDays: [] });
+});

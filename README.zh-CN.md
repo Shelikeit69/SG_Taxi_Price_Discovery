@@ -38,6 +38,7 @@
 | `worker/app.js`、`worker/index.mjs` | Worker 路由和入口；入口在部署时把 `web/data/` 打包进去 |
 | `wrangler.toml.example` | Worker 配置模板；带数据库 ID 的 `wrangler.toml` 不提交 |
 | `src/rain.js` | 把行程匹配到 data.gov.sg 降雨读数里最近的雨量站 |
+| `worker/rainjob.js` | 每小时运行一次，给时段已结束的行程补上“是否下雨” |
 | `scripts/build_data.py` | 把站点、线路和海岸线数据转成地图用的精简 JSON |
 | `scripts/page_template.html` | 附加费地图页面模板（Leaflet） |
 | `scripts/build_page.py` | 填充模板，生成一个不依赖外部文件的 HTML 页面 |
