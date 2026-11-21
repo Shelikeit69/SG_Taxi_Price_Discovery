@@ -10,7 +10,7 @@ The reference fare comes only from public rates. It is an estimate, not a quote.
 
 ## Status
 
-Early development. The fare formula and data design are settled, and the fare calculation module is written and tested. A first version of the fare page is in `web/`; it still needs the station list and the station-to-station distance table, which are not built yet. The table schema, the submission checks and the server-side submission handler are written and tested; the submission form, the Worker entry point and deployment are not done yet.
+Early development. The fare formula and data design are settled, and the fare calculation module is written and tested. A first version of the fare page is in `web/`; it still needs the station list and the station-to-station distance table, which are not built yet. The table schema, the submission checks and the server-side submission handler are written and tested; so are the submission form and the Worker entry point. Deployment is not done yet.
 
 What is in the repository today:
 
@@ -26,6 +26,8 @@ What is in the repository today:
 | `db/schema.sql` | Database table for fare submissions (Cloudflare D1) |
 | `src/submission.js` | Format checks for a submission before it is stored |
 | `worker/submit.js` | Submission handler for the Cloudflare Worker (not deployed) |
+| `worker/app.js`, `worker/index.mjs` | Worker routing and entry point; the entry bundles `web/data/` at deploy time |
+| `wrangler.toml.example` | Worker config template; the real `wrangler.toml` with the database ID is not committed |
 | `scripts/build_data.py` | Turns station, line and coastline data into a compact JSON file for the map |
 | `scripts/page_template.html` | Template for the surcharge map page (Leaflet) |
 | `scripts/build_page.py` | Fills the template and writes a single self-contained HTML page |

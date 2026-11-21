@@ -11,3 +11,6 @@ __pycache__/
 *.tgz
 # Station and distance data are generated, not committed (licences to be confirmed)
 web/data/
+
+# Local Worker config holds the D1 database ID
+wrangler.toml

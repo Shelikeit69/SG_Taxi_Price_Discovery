@@ -19,7 +19,7 @@
 
 ## 📍 进度
 
-早期开发。计价公式和数据设计已经定下，标准价计算模块已写好并通过测试。计算页第一版在 `web/`，还缺站点清单和站到站距离表，这两样还没做。数据表结构、提交检查和服务端提交处理函数已写好并通过测试；提交表单、Worker 入口和部署还没做。
+早期开发。计价公式和数据设计已经定下，标准价计算模块已写好并通过测试。计算页第一版在 `web/`，还缺站点清单和站到站距离表，这两样还没做。数据表结构、提交检查和服务端提交处理函数已写好并通过测试；提交表单和 Worker 入口也已写好。部署还没做。
 
 仓库里现在有：
 
@@ -35,6 +35,8 @@
 | `db/schema.sql` | 存放提交记录的数据表（Cloudflare D1） |
 | `src/submission.js` | 提交记录入库前的格式检查 |
 | `worker/submit.js` | Cloudflare Worker 的提交处理函数（未部署） |
+| `worker/app.js`、`worker/index.mjs` | Worker 路由和入口；入口在部署时把 `web/data/` 打包进去 |
+| `wrangler.toml.example` | Worker 配置模板；带数据库 ID 的 `wrangler.toml` 不提交 |
 | `scripts/build_data.py` | 把站点、线路和海岸线数据转成地图用的精简 JSON |
 | `scripts/page_template.html` | 附加费地图页面模板（Leaflet） |
 | `scripts/build_page.py` | 填充模板，生成一个不依赖外部文件的 HTML 页面 |
