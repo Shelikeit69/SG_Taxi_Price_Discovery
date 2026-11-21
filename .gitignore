@@ -1,0 +1,11 @@
+# Built page and derived map data stay out of the repo until the source data licences are confirmed.
+build/
+data/raw/
+mapdata.json
+node_modules/
+__pycache__/
+
+# Secrets live in Cloudflare, never here.
+.env
+.dev.vars
+*.tgz

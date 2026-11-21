@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>新加坡德士附加费地图</title>
+<style>/*LEAFLETCSS*/</style>
+<style>
+:root{--ink:#2C2C2A;--mut:#5F5E5A;--line:#D3D1C7;--red:#C8381E;--redbg:#FBE3DC;--pur:#534AB7;--bg:#FAF9F5;}
+*{box-sizing:border-box}html,body{margin:0;height:100%;font-family:system-ui,-apple-system,"PingFang SC","Noto Sans CJK SC",sans-serif;color:var(--ink);background:var(--bg)}
+.wrap{display:flex;flex-direction:column;height:100%}
+header{padding:10px 14px 8px;border-bottom:1px solid var(--line);background:#fff}
+h1{font-size:16px;font-weight:600;margin:0 0 6px}
+.ctl{display:flex;flex-wrap:wrap;gap:8px;align-items:center;font-size:14px}
+.ctl label{display:flex;gap:6px;align-items:center}
+.ctl input{width:128px}.ctl input,.ctl select,.ctl button{font:inherit;padding:5px 8px;border:1px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+.ctl button{cursor:pointer}
+#status{margin-top:6px;font-size:13px;line-height:1.5}
+#status b{font-weight:600}
+.pill{display:inline-block;padding:1px 8px;border-radius:99px;font-size:12.5px;margin-right:4px}
+.p-on{background:var(--redbg);color:#8A2410}.p-off{background:#EEEDE7;color:var(--mut)}
+#map{flex:1;min-height:360px;background:#DDEBF2}
+.leaflet-container{background:#DDEBF2;font-family:inherit}
+.lbl{background:transparent;border:0;box-shadow:none;padding:0;font-size:11px;color:#3d3d3a;text-shadow:0 0 3px #fff,0 0 3px #fff,0 0 3px #fff;white-space:nowrap}
+.lbl:before{display:none}
+.lbl-sur{font-size:12.5px;font-weight:600;color:#8A2410}
+.lbl-cbd{color:#3C3489}
+.lbl-cand{color:#7F77DD;font-style:italic}
+.area{font-size:11px;letter-spacing:.06em;color:#888780;text-transform:uppercase;white-space:nowrap;text-shadow:0 0 3px #F4F2EB}
+.hide-st .lbl-st,.hide-st .lbl-cbd,.hide-st .lbl-cand{visibility:hidden}
+.hide-area .area{visibility:hidden}
+.legend{display:flex;flex-wrap:wrap;gap:2px 12px;margin-top:6px;font-size:12px;color:var(--mut)}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:50%;margin-right:6px;vertical-align:-1px}
+footer summary{cursor:pointer;font-size:12px}footer{font-size:11.5px;color:var(--mut);padding:6px 14px 10px;background:#fff;border-top:1px solid var(--line);line-height:1.5}
+footer a{color:var(--mut)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+<h1>新加坡德士附加费地图（按起点站）</h1>
+<div class="ctl">
+<label>上车 <input id="t" type="time" value="18:00" step="60"></label>
+<label><select id="day"><option value="wd">工作日</option><option value="we">周末/公共假日</option></select></label>
+<button id="cbd" type="button">CBD</button>
+<button id="all" type="button">全岛</button>
+</div>
+<div id="status"></div>
+<div class="legend"><span><i style="background:#C8381E"></i>此刻收附加费</span><span><i style="background:#534AB7"></i>CBD 站，此刻不收</span><span><i style="background:#fff;border:1.8px solid #7F77DD"></i>候选 CBD 站（未定）</span><span><i style="background:#888780"></i>无附加费</span></div>
+</header>
+<div id="map" role="application" aria-label="新加坡地铁站与德士附加费地图"></div>
+<footer><details><summary>说明与数据来源</summary>附加费是固定金额，在高峰 25% 或深夜 50% 附加之后再加，不乘倍数。点地铁站看该站上车的附加费。CBD 19 站为草拟清单，空心圈为候选站，均待确认。底图不含街道：页面不能加载外部地图图片，街道底图（如 OneMap）待定。数据：站点和线路 <a href="https://github.com/cheeaun/sgraildata">cheeaun/sgraildata</a>（源自 LTA 开放数据），海岸线和规划区 <a href="https://github.com/yinshanyang/singapore">yinshanyang/singapore</a>；费率 <a href="https://www.cdgtaxi.com.sg/fares/">ComfortDelGro 官网</a>，2026-11-21 核对。示意图，非测绘精度。</details></footer>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<script>
+const D=/*DATA*/;
+/*SURCHARGE*/
+const DIR={"Orchard":"left","Somerset":"left","Dhoby Ghaut":"left","City Hall":"left","Fort Canning":"left","Chinatown":"left","Tanjong Pagar":"left","Rochor":"left","Little India":"left","Outram Park":"left","Maxwell":"bottom","Shenton Way":"bottom","Prince Edward Road":"bottom","Esplanade":"top","Gardens by the Bay":"bottom","Marina South Pier":"bottom","Changi Airport":"left","Expo":"bottom"};
+const fmt=v=>"$"+v.toFixed(2);
+const map=L.map("map",{zoomSnap:0.25,attributionControl:false,minZoom:10,maxZoom:17});
+const ll=c=>[c[1],c[0]];
+D.land.forEach(r=>L.polygon(r.map(ll),{color:"#B4B2A9",weight:0.8,fillColor:"#F4F2EB",fillOpacity:1,interactive:false}).addTo(map));
+D.areas.forEach(a=>{a.p.forEach(r=>L.polygon(r.map(ll),{color:"#D3D1C7",weight:0.6,fill:false,interactive:false}).addTo(map));
+ L.marker(ll(a.c),{icon:L.divIcon({className:"",html:'<div class="area">'+a.n+'</div>',iconSize:null}),interactive:false}).addTo(map);});
+const byName={};D.st.forEach(s=>byName[s.n]=s);
+function hull(pts){pts=pts.slice().sort((a,b)=>a[0]-b[0]||a[1]-b[1]);const cr=(o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);const lo=[],up=[];for(const p of pts){while(lo.length>1&&cr(lo[lo.length-2],lo[lo.length-1],p)<=0)lo.pop();lo.push(p)}for(const p of pts.slice().reverse()){while(up.length>1&&cr(up[up.length-2],up[up.length-1],p)<=0)up.pop();up.push(p)}const h=lo.slice(0,-1).concat(up.slice(0,-1));const cx=h.reduce((s,p)=>s+p[0],0)/h.length,cy=h.reduce((s,p)=>s+p[1],0)/h.length;return h.map(p=>[cx+(p[0]-cx)*1.15,cy+(p[1]-cy)*1.15]);}
+const zone=L.polygon(hull(CBD.map(n=>byName[n].c)).map(ll),{weight:1.5,interactive:false}).addTo(map);
+D.lines.forEach(l=>l.s.forEach(s=>L.polyline(s.map(ll),{color:l.c,weight:3,opacity:0.85,interactive:false}).addTo(map)));
+const marks=[];
+D.st.forEach(s=>{
+ const kind=LOC[s.n]?"loc":CBD.includes(s.n)?"cbd":CAND.includes(s.n)?"cand":"st";
+ const m=L.circleMarker(ll(s.c),{radius:kind==="st"?3.5:kind==="loc"?7:5.5,weight:kind==="cand"?1.8:1,color:"#fff",fillOpacity:1}).addTo(map);
+ const cls=(s.n==="Gardens by the Bay"||s.n==="Marina South Pier")?"lbl lbl-sur lbl-cbd":kind==="loc"?"lbl lbl-sur":kind==="cbd"?"lbl lbl-cbd":kind==="cand"?"lbl lbl-cand":"lbl lbl-st";
+ const dir=DIR[s.n]||"right";const off={right:[6,0],left:[-6,0],top:[0,-6],bottom:[0,6]}[dir];
+ m.bindTooltip(s.n,{permanent:true,direction:dir,offset:off,className:cls});
+ m.on("click",()=>m.bindPopup(popup(s,kind)).openPopup());
+ marks.push({s,m,kind});});
+function minutes(){const v=document.getElementById("t").value||"00:00";const[h,mm]=v.split(":").map(Number);return h*60+mm;}
+function popup(s,kind){const m=minutes(),day=document.getElementById("day").value;const[lab,k]=mult(m,day);
+ let sur=0,rule="无附加费";
+ if(kind==="loc"){sur=LOC[s.n].f(m);rule=LOC[s.n].place+"：每天 "+LOC[s.n].rule;}
+ else if(kind==="cbd"){sur=cbdOn(m)?3:0;rule="市区附加费：每天 17:00–23:59 $3.00（CBD 清单草拟）";}
+ else if(kind==="cand"){rule="候选 CBD 站，未定：若加入，17:00–23:59 $3.00";}
+ return "<b>"+s.n+"</b> "+(s.zh||"")+"<br>"+s.code+"<br>"+document.getElementById("t").value+"（"+(day==="wd"?"工作日":"周末/假日")+"）上车："+lab+(k>1?" ×"+k:"")+"，附加费 "+fmt(sur)+"<br><span style='color:#5F5E5A'>"+rule+"</span>";}
+function render(){const m=minutes(),day=document.getElementById("day").value;const[lab,k]=mult(m,day);const on=cbdOn(m);
+ zone.setStyle(on?{color:"#C8381E",fillColor:"#C8381E",fillOpacity:0.18,dashArray:null}:{color:"#888780",fillColor:"#888780",fillOpacity:0.04,dashArray:"4 4"});
+ marks.forEach(({s,m:mk,kind})=>{
+  if(kind==="loc"){const v=LOC[s.n].f(m);mk.setStyle({fillColor:"#C8381E",radius:7});mk.setTooltipContent(s.n+" +"+fmt(v));}
+  else if(kind==="cbd"){mk.setStyle({fillColor:on?"#C8381E":"#534AB7"});}
+  else if(kind==="cand"){mk.setStyle({fillColor:"#fff",color:"#7F77DD"});}
+  else mk.setStyle({fillColor:"#888780"});});
+ const locs=Object.keys(LOC).map(n=>LOC[n].place.replace("Marina Bay Cruise Centre","邮轮中心").replace("Singapore Expo","Expo")+" +"+fmt(LOC[n].f(m))).join("，");
+ document.getElementById("status").innerHTML='<span class="pill '+(k>1?"p-on":"p-off")+'">'+lab+(k>1?" 跑表价 ×"+k:" 无时段附加")+'</span><span class="pill '+(on?"p-on":"p-off")+'">CBD 市区附加费 '+(on?"+$3 生效":"不收")+'</span><br>地点附加费：'+locs+'。';}
+
+function zoomCls(){const z=map.getZoom(),c=map.getContainer();c.classList.toggle("hide-st",z<13.5);c.classList.toggle("hide-area",z<12);}
+map.on("zoomend",zoomCls);
+const isl=L.latLngBounds([[1.23,103.62],[1.47,104.03]]);
+document.getElementById("all").onclick=()=>map.fitBounds(isl);
+document.getElementById("cbd").onclick=()=>map.setView([1.2885,103.851],14.25);
+["t","day"].forEach(id=>document.getElementById(id).addEventListener("input",render));
+map.fitBounds(isl);zoomCls();render();
+</script>
+</body>
+</html>
