@@ -30,6 +30,74 @@
     $("notIncluded").replaceChildren(...TEXT.notIncluded.map((s) => li(s)));
     $("rates").textContent = TEXT.rates(RATES.version);
     $("saved").textContent = TEXT.savedNote;
+    $("submitTitle").textContent = TEXT.submitTitle;
+    $("submitIntro").textContent = TEXT.submitIntro;
+    $("platformLabel").textContent = TEXT.platform;
+    const choose = document.createElement("option");
+    choose.value = "";
+    choose.textContent = TEXT.choosePlatform;
+    $("platform").replaceChildren(choose, ...Object.entries(TEXT.platforms).map(([v, label]) => {
+      const o = document.createElement("option");
+      o.value = v;
+      o.textContent = label;
+      return o;
+    }));
+    $("streetHailHint").textContent = TEXT.streetHailHint;
+    $("bookedFareLabel").textContent = TEXT.bookedFare;
+    $("discountLabel").textContent = TEXT.discount;
+    $("consent").textContent = TEXT.consent;
+    $("storedTitle").textContent = TEXT.storedTitle;
+    $("stored").textContent = TEXT.stored;
+    $("notStored").textContent = TEXT.notStored;
+    $("submitBtn").textContent = TEXT.submit;
+  }
+
+  function rideTimeNote() {
+    const t = $("time").value;
+    $("rideTimeNote").textContent = fromSavedRoute ? TEXT.rideTimeNote(checkDate, t) : TEXT.noSavedRoute + " " + TEXT.rideTimeNote(checkDate, t);
+  }
+
+  async function submit(e) {
+    e.preventDefault();
+    const status = $("submitStatus");
+    status.className = "";
+    if (!$("total").textContent) {
+      status.textContent = TEXT.needRoute;
+      return;
+    }
+    const payload = {
+      origin: $("origin").value,
+      dest: $("dest").value,
+      rideTime: `${checkDate}T${$("time").value}`,
+      day: $("day").value,
+      platform: $("platform").value,
+      bookedFare: $("bookedFare").value.trim(),
+      discount: $("discount").checked,
+    };
+    status.textContent = TEXT.submitting;
+    $("submitBtn").disabled = true;
+    try {
+      const res = await fetch("/api/submit", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      if (res.status === 201) {
+        if (storage) clearRoute(storage);
+        status.textContent = TEXT.submitted;
+        status.className = "ok";
+        $("bookedFare").value = "";
+        $("discount").checked = false;
+      } else {
+        status.textContent = res.status === 429 ? TEXT.rateLimited : TEXT.submitFailed;
+        status.className = "warn";
+      }
+    } catch {
+      status.textContent = TEXT.submitFailed;
+      status.className = "warn";
+    } finally {
+      $("submitBtn").disabled = false;
+    }
   }
 
   function li(text) {
@@ -39,14 +107,23 @@
   }
 
   // Current time and day type in Singapore, whatever the phone's time zone.
-  function nowInSingapore() {
+  function singaporeTime(ms = Date.now()) {
     const parts = new Intl.DateTimeFormat("en-GB", {
-      timeZone: "Asia/Singapore", hour: "2-digit", minute: "2-digit", weekday: "short", hourCycle: "h23",
-    }).formatToParts(new Date());
+      timeZone: "Asia/Singapore", year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", weekday: "short", hourCycle: "h23",
+    }).formatToParts(new Date(ms));
     const get = (t) => parts.find((p) => p.type === t).value;
     const weekend = get("weekday") === "Sat" || get("weekday") === "Sun";
-    return { time: `${get("hour")}:${get("minute")}`, day: weekend ? "we" : "wd" };
+    return {
+      date: `${get("year")}-${get("month")}-${get("day")}`,
+      time: `${get("hour")}:${get("minute")}`,
+      day: weekend ? "we" : "wd",
+    };
   }
+
+  // Date of the check: from the saved route if there is one, otherwise today.
+  let checkDate = singaporeTime().date;
+  let fromSavedRoute = false;
 
   function fillStations() {
     const names = stations.map((s) => s.name).sort((a, b) => a.localeCompare(b));
@@ -76,6 +153,9 @@
     const dest = $("dest").value;
     const details = [];
     $("total").textContent = "";
+    // A changed route makes any earlier submit message out of date.
+    $("submitStatus").textContent = "";
+    $("submitStatus").className = "";
     if (!origin || !dest) return show(TEXT.pickBoth, details);
     if (origin === dest) return show(TEXT.sameStation, details);
     const metres = distances[origin] && distances[origin][dest];
@@ -85,7 +165,12 @@
     $("total").textContent = money(r.total);
     details.push(TEXT.roadDistance(metres), TEXT.band[r.band]);
     show(surchargeNote(origin, r), details);
-    if (save && storage) saveRoute(storage, { origin, dest });
+    if (save && storage) {
+      saveRoute(storage, { origin, dest });
+      checkDate = singaporeTime().date;
+      fromSavedRoute = true;
+      rideTimeNote();
+    }
   }
 
   function show(message, details) {
@@ -126,7 +211,7 @@
 
   async function start() {
     setText();
-    const now = nowInSingapore();
+    const now = singaporeTime();
     $("time").value = now.time;
     $("day").value = now.day;
     try {
@@ -134,7 +219,7 @@
     } catch {
       $("message").textContent = TEXT.noData;
       $("message").className = "warn";
-      for (const id of ["origin", "dest", "locate", "time", "day"]) $(id).disabled = true;
+      for (const id of ["origin", "dest", "locate", "time", "day", "platform", "bookedFare", "discount", "submitBtn"]) $(id).disabled = true;
       return;
     }
     fillStations();
@@ -142,11 +227,23 @@
     if (saved) {
       $("origin").value = saved.origin;
       $("dest").value = saved.dest;
+      // The ride time is the time of the check, not the time the page was reopened.
+      const at = singaporeTime(saved.checkedAt);
+      $("time").value = at.time;
+      $("day").value = at.day;
+      checkDate = at.date;
+      fromSavedRoute = true;
     }
     $("locate").addEventListener("click", locate);
     for (const id of ["origin", "dest", "time", "day"]) $(id).addEventListener("change", () => render());
     $("form").addEventListener("submit", (e) => e.preventDefault());
+    $("time").addEventListener("change", rideTimeNote);
+    $("platform").addEventListener("change", () => {
+      $("streetHailHint").hidden = $("platform").value !== "street_hail";
+    });
+    $("submitForm").addEventListener("submit", submit);
     render(false);
+    rideTimeNote();
   }
 
   start();
