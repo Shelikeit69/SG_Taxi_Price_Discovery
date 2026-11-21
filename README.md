@@ -28,6 +28,7 @@ What is in the repository today:
 | `worker/submit.js` | Submission handler for the Cloudflare Worker (not deployed) |
 | `worker/app.js`, `worker/index.mjs` | Worker routing and entry point; the entry bundles `web/data/` at deploy time |
 | `wrangler.toml.example` | Worker config template; the real `wrangler.toml` with the database ID is not committed |
+| `src/rain.js` | Matches a ride to the nearest rain gauge in data.gov.sg rainfall readings |
 | `scripts/build_data.py` | Turns station, line and coastline data into a compact JSON file for the map |
 | `scripts/page_template.html` | Template for the surcharge map page (Leaflet) |
 | `scripts/build_page.py` | Fills the template and writes a single self-contained HTML page |
