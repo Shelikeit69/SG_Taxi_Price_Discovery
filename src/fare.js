@@ -11,7 +11,8 @@
 // All money is computed in integers and rounded to the cent only at the end,
 // so results match the hand-worked examples exactly.
 
-const S = typeof module !== "undefined" ? require("./surcharge.js") : globalThis;
+// In Node, load the surcharge rules; in a page, surcharge.js is loaded first as a plain script.
+const S = typeof module !== "undefined" ? require("./surcharge.js") : { CBD, LOC, cbdOn, mult };
 
 const RATES = {
   version: "2026-11-21",
