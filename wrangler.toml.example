@@ -1,0 +1,20 @@
+# Copy to wrangler.toml (git-ignored) and fill in the database ID there.
+# The database ID and API tokens are kept out of the repository.
+name = "sg-taxi-fare-submit"
+main = "worker/index.mjs"
+compatibility_date = "2026-11-01"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "sg-taxi-fare"
+database_id = "set-in-your-local-wrangler.toml"
+
+# 3 submissions per IP per 60 seconds (design decision, 2026-11-21).
+# Counts are per Cloudflare location and approximate.
+[[ratelimits]]
+name = "RATE_LIMITER"
+namespace_id = "1001"
+
+  [ratelimits.simple]
+  limit = 3
+  period = 60
