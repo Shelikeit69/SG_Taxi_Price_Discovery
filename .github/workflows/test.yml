@@ -17,4 +17,4 @@ jobs:
         with:
           node-version: 22
       - name: Fare rule tests
-        run: node --test tests/surcharge.test.js
+        run: node --test tests/*.test.js

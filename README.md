@@ -10,7 +10,7 @@ The reference fare comes only from public rates. It is an estimate, not a quote.
 
 ## Status
 
-Early development. The fare formula and data design are settled; the fare calculator and submission form are not built yet.
+Early development. The fare formula and data design are settled, and the fare calculation module is written and tested. The calculator page, the station-to-station distance table and the submission form are not built yet.
 
 What is in the repository today:
 
@@ -18,6 +18,8 @@ What is in the repository today:
 | --- | --- |
 | `src/surcharge.js` | Time-band multipliers and surcharge rules |
 | `tests/surcharge.test.js` | Boundary tests for those rules |
+| `src/fare.js` | Reference fare from road distance, time and starting station |
+| `tests/fare.test.js` | Fare tests, including the worked example below |
 | `scripts/build_data.py` | Turns station, line and coastline data into a compact JSON file for the map |
 | `scripts/page_template.html` | Template for the surcharge map page (Leaflet) |
 | `scripts/build_page.py` | Fills the template and writes a single self-contained HTML page |
@@ -37,7 +39,9 @@ Reference fare = (flag-down + distance + waiting) × (1 + time-band surcharge) +
 | Peak | +25%: weekdays 6:00-9:29, weekends and public holidays 10:00-13:59, every day 17:00-23:59 |
 | Late night | +50%: 0:00-5:59 |
 
-The $0.27 rates include a temporary $0.01 surcharge that runs until 2027-02-28. Waiting time is not measured; it is estimated as 10% of the distance charge off-peak and 20% at peak, to be calibrated later against submitted street-hail fares.
+The $0.27 rates include a temporary $0.01 surcharge that runs until 2027-02-28. Waiting time is not measured; it is estimated as 10% of the distance charge off-peak and 20% at peak, to be calibrated later against submitted street-hail fares. Late night uses 10% for now; this has not been confirmed.
+
+Worked example: Tampines to City Hall, taking the road distance as 17 km, is $17.37 off-peak and $23.17 at peak. Amounts are rounded to the cent only at the end.
 
 Surcharges are fixed amounts added after the time-band multiplier. They are applied by starting station:
 
@@ -54,7 +58,7 @@ Not included: ERP charges, booking fees, and surcharges at places with no MRT st
 ## Run the tests
 
 ```sh
-node --test tests/surcharge.test.js
+node --test tests/*.test.js
 ```
 
 ## Build the surcharge map
