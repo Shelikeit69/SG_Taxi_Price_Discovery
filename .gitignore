@@ -9,3 +9,5 @@ __pycache__/
 .env
 .dev.vars
 *.tgz
+# Station and distance data are generated, not committed (licences to be confirmed)
+web/data/
