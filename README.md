@@ -10,7 +10,7 @@ The reference fare comes only from public rates. It is an estimate, not a quote.
 
 ## Status
 
-Early development. The fare formula and data design are settled, and the fare calculation module is written and tested. A first version of the fare page is in `web/`; it still needs the station list and the station-to-station distance table, which are not built yet. The submission form is not built yet.
+Early development. The fare formula and data design are settled, and the fare calculation module is written and tested. A first version of the fare page is in `web/`; it still needs the station list and the station-to-station distance table, which are not built yet. The submission form and its server code are not built yet; the table schema and the submission checks are.
 
 What is in the repository today:
 
@@ -23,6 +23,8 @@ What is in the repository today:
 | `src/route.js` | Nearest station and the route saved on the phone for 6 hours |
 | `src/text.js` | All page text in one place |
 | `web/` | Fare page (needs `web/data/stations.json` and `web/data/distances.json`, not committed) |
+| `db/schema.sql` | Database table for fare submissions (Cloudflare D1) |
+| `src/submission.js` | Format checks for a submission before it is stored |
 | `scripts/build_data.py` | Turns station, line and coastline data into a compact JSON file for the map |
 | `scripts/page_template.html` | Template for the surcharge map page (Leaflet) |
 | `scripts/build_page.py` | Fills the template and writes a single self-contained HTML page |
