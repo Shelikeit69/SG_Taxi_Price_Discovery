@@ -10,7 +10,7 @@ The reference fare comes only from public rates. It is an estimate, not a quote.
 
 ## Status
 
-Early development. The fare formula and data design are settled, and the fare calculation module is written and tested. The calculator page, the station-to-station distance table and the submission form are not built yet.
+Early development. The fare formula and data design are settled, and the fare calculation module is written and tested. A first version of the fare page is in `web/`; it still needs the station list and the station-to-station distance table, which are not built yet. The submission form is not built yet.
 
 What is in the repository today:
 
@@ -20,6 +20,9 @@ What is in the repository today:
 | `tests/surcharge.test.js` | Boundary tests for those rules |
 | `src/fare.js` | Reference fare from road distance, time and starting station |
 | `tests/fare.test.js` | Fare tests, including the worked example below |
+| `src/route.js` | Nearest station and the route saved on the phone for 6 hours |
+| `src/text.js` | All page text in one place |
+| `web/` | Fare page (needs `web/data/stations.json` and `web/data/distances.json`, not committed) |
 | `scripts/build_data.py` | Turns station, line and coastline data into a compact JSON file for the map |
 | `scripts/page_template.html` | Template for the surcharge map page (Leaflet) |
 | `scripts/build_page.py` | Fills the template and writes a single self-contained HTML page |
