@@ -94,7 +94,9 @@ Open `build/index.html` in a browser.
 
 ## Privacy
 
-Fare submissions, once built, will store only the two stations, the time rounded to 15 minutes, the platform, the booked fare and an optional discount flag. No accounts, phone numbers, device IDs, IP addresses or location coordinates are stored.
+Each submission stores the two stations, the ride time rounded down to 15 minutes, the platform, the booked price and an optional discount flag. The server adds the reference fare, the rate-table version and, later, a rain flag. The table is in `db/schema.sql`.
+
+Nothing else is stored: no account, phone number, name, device ID, IP address, location or exact time. The IP address is used only for the rate limit and is not saved. Location is read only when you press the button and stays in the browser. Submissions are not live yet; the Worker has not been deployed.
 
 ## Licence
 
