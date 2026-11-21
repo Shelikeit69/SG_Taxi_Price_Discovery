@@ -22,6 +22,12 @@
   ul { margin: 0.25rem 0 0; padding-left: 1.25rem; }
   #status { min-height: 1.5em; }
   .warn { color: var(--accent); }
+  .submit { margin-top: 1rem; }
+  .submit h2 { font-size: 1.1rem; margin: 0; }
+  label.check { display: flex; gap: 0.5rem; align-items: center; font-weight: 400; }
+  label.check input { width: auto; min-height: 0; }
+  details { font-size: 0.9rem; }
+  .ok { color: #2f6b2f; }
 </style>
 </head>
 <body>
@@ -49,6 +55,19 @@
     <p id="rates" class="muted"></p>
     <p id="saved" class="muted"></p>
   </section>
+  <form id="submitForm" class="submit" novalidate>
+    <h2 id="submitTitle"></h2>
+    <p id="submitIntro" class="muted"></p>
+    <label><span id="platformLabel"></span><select id="platform"></select></label>
+    <p id="streetHailHint" class="muted" hidden></p>
+    <label><span id="bookedFareLabel"></span><input id="bookedFare" type="text" inputmode="decimal" autocomplete="off" placeholder="0.00"></label>
+    <label class="check"><input id="discount" type="checkbox"><span id="discountLabel"></span></label>
+    <p id="rideTimeNote" class="muted"></p>
+    <p id="consent" class="muted"></p>
+    <details><summary id="storedTitle"></summary><p id="stored" class="muted"></p><p id="notStored" class="muted"></p></details>
+    <button type="submit" id="submitBtn"></button>
+    <p id="submitStatus" role="status" aria-live="polite"></p>
+  </form>
 </main>
 <script src="../src/surcharge.js"></script>
 <script src="../src/fare.js"></script>
