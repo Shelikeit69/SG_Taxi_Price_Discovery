@@ -1,7 +1,7 @@
 // Boundary tests for time bands and surcharges. Run: node --test tests/
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { CBD, CAND, LOC, cbdOn, mult } = require("../src/surcharge.js");
+const { CBD, BORDER, LOC, cbdOn, mult } = require("../src/surcharge.js");
 
 const t = (h, m) => h * 60 + m;
 
@@ -42,7 +42,13 @@ test("location and city surcharge boundaries", () => {
 });
 
 test("station lists", () => {
-  assert.equal(CBD.length, 19);
-  assert.equal(CAND.length, 7);
-  assert.equal(CBD.filter((s) => CAND.includes(s)).length, 0);
+  assert.equal(CBD.length, 21);
+  assert.equal(new Set(CBD).size, 21);
+  assert.ok(CBD.includes("Nicoll Highway"));
+  assert.ok(CBD.includes("Prince Edward Road"));
+  assert.deepEqual(BORDER, ["Bugis", "Rochor"]);
+  assert.equal(CBD.filter((s) => BORDER.includes(s)).length, 0);
+  for (const s of ["Little India", "Farrer Park", "Jalan Besar", "Outram Park"]) {
+    assert.ok(!CBD.includes(s), s);
+  }
 });

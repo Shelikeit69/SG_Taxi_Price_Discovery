@@ -56,7 +56,7 @@ $0.27 里含 $0.01 的临时附加费，执行到 2027-02-28。等候时间没�
 | Marina South Pier（去 Marina Bay Cruise Centre） | 7:00–16:59 收 $5.00，其他时间 $3.00 |
 | Gardens by the Bay | $3.00 |
 | Expo | $2.00 |
-| 19 个市中心站（草拟清单见 `src/surcharge.js`） | 17:00–23:59 收 $3.00 |
+| 21 个市中心站（暂定清单见 `src/surcharge.js`） | 17:00–23:59 收 $3.00 |
 
 没算进去的：ERP 电子道路收费、预订费，以及没有地铁站的地点的附加费（Mandai、Seletar Airport、Resorts World Sentosa、Tanah Merah Ferry Terminal）。
 
