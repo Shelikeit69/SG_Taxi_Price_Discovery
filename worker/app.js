@@ -2,6 +2,7 @@
 // Kept separate from the entry file so it can be tested without the data files.
 
 const { handleSubmit } = require("./submit.js");
+const { runRainJob } = require("./rainjob.js");
 
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8" };
 
@@ -12,7 +13,14 @@ function createWorker(data, uuid = () => crypto.randomUUID()) {
   const table = data.distances.metres;
   const deps = { stations, metres: (a, b) => table[a] && table[a][b], uuid };
 
+  const coords = new Map(data.stations.map((s) => [s.name, { lat: s.lat, lng: s.lng }]));
+
   return {
+    // Cron trigger: fill the rain column for rides whose slot has ended.
+    scheduled(event, env, ctx) {
+      ctx.waitUntil(runRainJob(env, { fetch: (url) => fetch(url), coords, now: Date.now() }));
+    },
+
     async fetch(request, env) {
       const { pathname } = new URL(request.url);
       if (pathname === "/api/submit") return handleSubmit(request, env, deps);

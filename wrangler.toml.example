@@ -18,3 +18,7 @@ namespace_id = "1001"
   [ratelimits.simple]
   limit = 3
   period = 60
+
+# Fill the rain column once an hour (minute 30, UTC).
+[triggers]
+crons = ["30 * * * *"]
