@@ -46,10 +46,10 @@ footer a{color:var(--mut)}
 <button id="all" type="button">全岛</button>
 </div>
 <div id="status"></div>
-<div class="legend"><span><i style="background:#C8381E"></i>此刻收附加费</span><span><i style="background:#534AB7"></i>CBD 站，此刻不收</span><span><i style="background:#fff;border:1.8px solid #7F77DD"></i>候选 CBD 站（未定）</span><span><i style="background:#888780"></i>无附加费</span></div>
+<div class="legend"><span><i style="background:#C8381E"></i>此刻收附加费</span><span><i style="background:#534AB7"></i>CBD 站，此刻不收</span><span><i style="background:#fff;border:1.8px solid #7F77DD"></i>压在 CBD 边界上的站（暂不计入）</span><span><i style="background:#888780"></i>无附加费</span></div>
 </header>
 <div id="map" role="application" aria-label="新加坡地铁站与德士附加费地图"></div>
-<footer><details><summary>说明与数据来源</summary>附加费是固定金额，在高峰 25% 或深夜 50% 附加之后再加，不乘倍数。点地铁站看该站上车的附加费。CBD 19 站为草拟清单，空心圈为候选站，均待确认。底图不含街道：页面不能加载外部地图图片，街道底图（如 OneMap）待定。数据：站点和线路 <a href="https://github.com/cheeaun/sgraildata">cheeaun/sgraildata</a>（源自 LTA 开放数据），海岸线和规划区 <a href="https://github.com/yinshanyang/singapore">yinshanyang/singapore</a>；费率 <a href="https://www.cdgtaxi.com.sg/fares/">ComfortDelGro 官网</a>，2026-11-21 核对。示意图，非测绘精度。</details></footer>
+<footer><details><summary>说明与数据来源</summary>附加费是固定金额，在高峰 25% 或深夜 50% 附加之后再加，不乘倍数。点地铁站看该站上车的附加费。CBD 21 站为暂定清单（2026-11-22），依据 CDG 的市区范围说明和 LTA 的 CBD 边界图；空心圈是压在边界上的站，暂不计入。底图不含街道。本图是内部核对工具，第一版网页不放。数据：站点和线路 <a href="https://github.com/cheeaun/sgraildata">cheeaun/sgraildata</a>（源自 LTA 开放数据），海岸线和规划区 <a href="https://github.com/yinshanyang/singapore">yinshanyang/singapore</a>；费率 <a href="https://www.cdgtaxi.com.sg/fares/">ComfortDelGro 官网</a>，2026-11-21 核对。示意图，非测绘精度。</details></footer>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <script>
@@ -68,7 +68,7 @@ const zone=L.polygon(hull(CBD.map(n=>byName[n].c)).map(ll),{weight:1.5,interacti
 D.lines.forEach(l=>l.s.forEach(s=>L.polyline(s.map(ll),{color:l.c,weight:3,opacity:0.85,interactive:false}).addTo(map)));
 const marks=[];
 D.st.forEach(s=>{
- const kind=LOC[s.n]?"loc":CBD.includes(s.n)?"cbd":CAND.includes(s.n)?"cand":"st";
+ const kind=LOC[s.n]?"loc":CBD.includes(s.n)?"cbd":BORDER.includes(s.n)?"cand":"st";
  const m=L.circleMarker(ll(s.c),{radius:kind==="st"?3.5:kind==="loc"?7:5.5,weight:kind==="cand"?1.8:1,color:"#fff",fillOpacity:1}).addTo(map);
  const cls=(s.n==="Gardens by the Bay"||s.n==="Marina South Pier")?"lbl lbl-sur lbl-cbd":kind==="loc"?"lbl lbl-sur":kind==="cbd"?"lbl lbl-cbd":kind==="cand"?"lbl lbl-cand":"lbl lbl-st";
  const dir=DIR[s.n]||"right";const off={right:[6,0],left:[-6,0],top:[0,-6],bottom:[0,6]}[dir];
@@ -79,8 +79,8 @@ function minutes(){const v=document.getElementById("t").value||"00:00";const[h,m
 function popup(s,kind){const m=minutes(),day=document.getElementById("day").value;const[lab,k]=mult(m,day);
  let sur=0,rule="无附加费";
  if(kind==="loc"){sur=LOC[s.n].f(m);rule=LOC[s.n].place+"：每天 "+LOC[s.n].rule;}
- else if(kind==="cbd"){sur=cbdOn(m)?3:0;rule="市区附加费：每天 17:00–23:59 $3.00（CBD 清单草拟）";}
- else if(kind==="cand"){rule="候选 CBD 站，未定：若加入，17:00–23:59 $3.00";}
+ else if(kind==="cbd"){sur=cbdOn(m)?3:0;rule="市区附加费：每天 17:00–23:59 $3.00（CBD 清单暂定）";}
+ else if(kind==="cand"){rule="压在 CBD 边界上，暂不计入市区附加费";}
  return "<b>"+s.n+"</b> "+(s.zh||"")+"<br>"+s.code+"<br>"+document.getElementById("t").value+"（"+(day==="wd"?"工作日":"周末/假日")+"）上车："+lab+(k>1?" ×"+k:"")+"，附加费 "+fmt(sur)+"<br><span style='color:#5F5E5A'>"+rule+"</span>";}
 function render(){const m=minutes(),day=document.getElementById("day").value;const[lab,k]=mult(m,day);const on=cbdOn(m);
  zone.setStyle(on?{color:"#C8381E",fillColor:"#C8381E",fillOpacity:0.18,dashArray:null}:{color:"#888780",fillColor:"#888780",fillOpacity:0.04,dashArray:"4 4"});

@@ -47,7 +47,7 @@ Surcharges are fixed amounts added after the time-band multiplier. They are appl
 | Marina South Pier (for Marina Bay Cruise Centre) | $5.00 from 7:00 to 16:59, $3.00 otherwise |
 | Gardens by the Bay | $3.00 |
 | Expo | $2.00 |
-| 19 central stations (draft list in `src/surcharge.js`) | $3.00 from 17:00 to 23:59 |
+| 21 central stations (provisional list in `src/surcharge.js`) | $3.00 from 17:00 to 23:59 |
 
 Not included: ERP charges, booking fees, and surcharges at places with no MRT station (Mandai, Seletar Airport, Resorts World Sentosa, Tanah Merah Ferry Terminal).
 
