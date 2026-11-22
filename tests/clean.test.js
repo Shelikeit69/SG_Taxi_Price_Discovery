@@ -10,7 +10,7 @@ const { cleanMonth, toCsv } = require("../src/clean.js");
 const regions = { Tampines: "East", "City Hall": "Central", Bugis: "Central", Woodlands: "North" };
 const ride = (o, d, slot, fare, extra = {}) => ({
   origin_station: o, dest_station: d, ride_time_15min: slot, platform: "grab",
-  booked_fare_sgd: fare, discount_flag: 0, benchmark_sgd: 20, formula_version: "v", rain: null, ...extra,
+  booked_fare_sgd: fare, discount_flag: 0, benchmark_sgd: 20, formula_version: "v", rain_mm: null, ...extra,
 });
 
 // Five Tampines -> City Hall rides (published by station) and one Woodlands -> Bugis ride (shown by region).
@@ -55,7 +55,7 @@ test("published rows follow ride time, not submission order", () => {
 });
 
 test("CSV quoting and empty values", () => {
-  const csv = toCsv([{ origin: 'A, "B"', dest: "C", location_level: "station", rain: null }]);
+  const csv = toCsv([{ origin: 'A, "B"', dest: "C", location_level: "station", rain_mm: null }]);
   assert.equal(csv.split("\n")[1], '"A, ""B""",C,station,,,,,,,');
 });
 

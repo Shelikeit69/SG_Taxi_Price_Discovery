@@ -47,7 +47,7 @@ test("valid submission is stored with a server-computed reference fare", async (
   assert.equal(row.benchmark_sgd, 23.17);
   assert.equal(row.booked_fare_sgd, 28.4);
   assert.equal(row.formula_version, "2026-11-21");
-  assert.equal(row.rain, null);
+  assert.equal(row.rain_mm, null);
   // Nothing identifying is stored: no IP or exact time anywhere in the row.
   assert.ok(!JSON.stringify(row).includes("203.0.113.9"));
   assert.ok(!JSON.stringify(row).includes("18:07"));

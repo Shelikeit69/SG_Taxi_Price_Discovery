@@ -53,9 +53,13 @@ function main(argv) {
     "",
     "Records are voluntary submissions and are not a random sample.",
     "",
-    "Licence: CC BY 4.0, except the `rain` column.",
+    "`rain_mm` is the rainfall in millimetres at the public rain gauge nearest the start station, over the ride's 15-minute slot; it is empty when that gauge had no reading. The project counts at least 0.2 mm as rain.",
     "",
-    `The \`rain\` column contains information derived from rainfall readings accessed from data.gov.sg in ${month}, which are made available under the terms of the Singapore Open Data Licence version 1.0 (https://data.gov.sg/open-data-licence).`,
+    "Rows are sorted by ride time, not by submission order, and carry no record ID. To report a problem with a row, give this file's name and the row number.",
+    "",
+    "Licence: CC BY 4.0, except the `rain_mm` column.",
+    "",
+    `The \`rain_mm\` column contains information derived from rainfall readings accessed from data.gov.sg in ${month}, which are made available under the terms of the Singapore Open Data Licence version 1.0 (https://data.gov.sg/open-data-licence).`,
     "",
   ].join("\n");
   fs.writeFileSync(path.join(outDir, `README_${month}.md`), readme);

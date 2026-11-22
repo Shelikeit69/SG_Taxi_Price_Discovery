@@ -16,7 +16,7 @@ function createWorker(data, uuid = () => crypto.randomUUID()) {
   const coords = new Map(data.stations.map((s) => [s.name, { lat: s.lat, lng: s.lng }]));
 
   return {
-    // Cron trigger: fill the rain column for rides whose slot has ended.
+    // Cron trigger: fill rain_mm for rides whose slot has ended.
     scheduled(event, env, ctx) {
       ctx.waitUntil(runRainJob(env, { fetch: (url) => fetch(url), coords, now: Date.now() }));
     },

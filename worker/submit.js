@@ -6,7 +6,7 @@
 //
 // The server recomputes the reference fare itself, so a client cannot change it.
 // The client's IP address is passed to the rate limiter only and is never stored.
-// The rain column is left empty here; it is filled in by a separate matching job.
+// The rain_mm column is left empty here; it is filled in by a separate matching job.
 
 const { checkSubmission } = require("../src/submission.js");
 const { fare, RATES } = require("../src/fare.js");
@@ -58,11 +58,11 @@ async function handleSubmit(request, env, deps) {
   const minutes = Number(hhmm.slice(0, 2)) * 60 + Number(hhmm.slice(3, 5));
   const benchmark = fare({ metres, minutes, day: input.day, origin: r.origin_station }).total;
 
-  const row = { id: deps.uuid(), ...r, benchmark_sgd: benchmark, formula_version: RATES.version, rain: null };
+  const row = { id: deps.uuid(), ...r, benchmark_sgd: benchmark, formula_version: RATES.version, rain_mm: null };
   await env.DB.prepare(
-    "INSERT INTO rides (id, origin_station, dest_station, ride_time_15min, platform, booked_fare_sgd, discount_flag, benchmark_sgd, formula_version, rain) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
+    "INSERT INTO rides (id, origin_station, dest_station, ride_time_15min, platform, booked_fare_sgd, discount_flag, benchmark_sgd, formula_version, rain_mm) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
   )
-    .bind(row.id, row.origin_station, row.dest_station, row.ride_time_15min, row.platform, row.booked_fare_sgd, row.discount_flag, row.benchmark_sgd, row.formula_version, row.rain)
+    .bind(row.id, row.origin_station, row.dest_station, row.ride_time_15min, row.platform, row.booked_fare_sgd, row.discount_flag, row.benchmark_sgd, row.formula_version, row.rain_mm)
     .run();
 
   return reply(201, { ok: true, benchmark });

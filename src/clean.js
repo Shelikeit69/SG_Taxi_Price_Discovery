@@ -21,7 +21,7 @@ const COLUMNS = [
   "discount_flag",
   "benchmark_sgd",
   "formula_version",
-  "rain",
+  "rain_mm",
 ];
 
 const dupKey = (r) => [r.origin_station, r.dest_station, r.ride_time_15min, r.platform, r.booked_fare_sgd].join("|");
@@ -75,7 +75,7 @@ function cleanMonth(rows, regions, options = {}) {
       discount_flag: r.discount_flag,
       benchmark_sgd: r.benchmark_sgd,
       formula_version: r.formula_version,
-      rain: r.rain,
+      rain_mm: r.rain_mm,
     };
   });
   if (missingRegion.size) throw new Error(`no region for: ${[...missingRegion].sort().join(", ")}`);

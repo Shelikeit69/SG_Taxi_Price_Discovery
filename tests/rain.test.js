@@ -1,7 +1,7 @@
 // Rain matching tests with a made-up response in the real API shape. Run: node --test tests/*.test.js
 const test = require("node:test");
 const assert = require("node:assert/strict");
-const { nearestGauge, slotTotal, rainFlag, dayUrl } = require("../src/rain.js");
+const { RAIN_THRESHOLD_MM, nearestGauge, slotTotal, slotRainMm, isRain, dayUrl } = require("../src/rain.js");
 
 const gauges = [
   { id: "G1", name: "East", location: { latitude: 1.35, longitude: 103.94 } },
@@ -31,12 +31,22 @@ test("slot total uses only readings inside the 15 minutes", () => {
   assert.ok(Math.abs(g1.mm - 0.4) < 1e-9);
 });
 
-test("rain flag", () => {
-  assert.equal(rainFlag("2026-11-21T18:00", "G1", readings), 1);
-  assert.equal(rainFlag("2026-11-21T18:00", "G2", readings), 1);
-  assert.equal(rainFlag("2026-11-21T18:15", "G2", readings), 0);
-  assert.equal(rainFlag("2026-11-21T19:00", "G1", readings), null);
-  assert.equal(rainFlag("2026-11-21T18:00", "G1", readings, 0.5), 0);
+test("slot millimetres: rounded to 0.1 mm, null without readings", () => {
+  assert.equal(slotRainMm("2026-11-21T18:00", "G1", readings), 0.4);
+  assert.equal(slotRainMm("2026-11-21T18:00", "G2", readings), 0.2);
+  assert.equal(slotRainMm("2026-11-21T18:15", "G2", readings), 0);
+  assert.equal(slotRainMm("2026-11-21T19:00", "G1", readings), null);
+  const noisy = [reading("20:00", 0.2, 0), reading("20:05", 0.2, 0), reading("20:10", 0.2, 0)];
+  assert.equal(slotRainMm("2026-11-21T20:00", "G1", noisy), 0.6); // 0.2 + 0.2 + 0.2 is 0.6000000000000001 in floating point
+});
+
+test("rain threshold is at least 0.2 mm", () => {
+  assert.equal(RAIN_THRESHOLD_MM, 0.2);
+  assert.equal(isRain(0.2), 1);
+  assert.equal(isRain(0.6000000000000001), 1);
+  assert.equal(isRain(0), 0);
+  assert.equal(isRain(null), null);
+  assert.equal(isRain(0.4, 1), 0);
 });
 
 test("day URL", () => {

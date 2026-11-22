@@ -39,9 +39,9 @@
 | `worker/app.js`、`worker/index.mjs` | Worker 路由和入口；入口在部署时把 `web/data/` 打包进去 |
 | `wrangler.toml.example` | Worker 配置模板；带数据库 ID 的 `wrangler.toml` 不提交 |
 | `src/rain.js` | 把行程匹配到 data.gov.sg 降雨读数里最近的雨量站 |
-| `worker/rainjob.js` | 每小时运行一次，给时段已结束的行程补上“是否下雨” |
+| `worker/rainjob.js` | 每小时运行一次，给时段已结束的行程补上 `rain_mm`：最近雨量站在乘车 15 分钟内的降雨量（毫米） |
 | `src/clean.js`、`scripts/monthly_export.js` | 每月清洗，生成公开的 CSV 和说明 |
-| `src/typical.js` | 阶段二：按平台、时段、是否下雨分组的溢价倍数；用了优惠的记录默认不算，另外计数 |
+| `src/typical.js` | 阶段二：按平台、时段、是否下雨（至少 0.2 毫米算下雨）分组的溢价倍数；用了优惠的记录默认不算，另外计数 |
 | `scripts/build_data.py` | 把站点、线路和海岸线数据转成地图用的精简 JSON |
 | `scripts/page_template.html` | 附加费地图页面模板（Leaflet） |
 | `scripts/build_page.py` | 填充模板，生成一个不依赖外部文件的 HTML 页面 |
@@ -104,7 +104,7 @@ python3 scripts/build_page.py data/raw/package/dist/leaflet.css mapdata.json bui
 
 ## 🔒 隐私
 
-每条提交只存这几项：起点站、终点站、向下取整到 15 分钟的乘车时间、平台、下单价格，以及一个可选的“用了优惠”标记。服务端再补上标准价、费率表版本，之后补上是否下雨。表结构见 `db/schema.sql`。
+每条提交只存这几项：起点站、终点站、向下取整到 15 分钟的乘车时间、平台、下单价格，以及一个可选的“用了优惠”标记。服务端再补上标准价、费率表版本，之后补上最近的公开雨量站测到的降雨量（毫米）。表结构见 `db/schema.sql`。
 
 其他一概不存：账号、手机号、姓名、设备 ID、IP 地址、定位、精确时间。IP 只用于频率限制，不保存。定位只在你点按钮时读取，留在浏览器里。提交功能还没上线，Worker 尚未部署。
 

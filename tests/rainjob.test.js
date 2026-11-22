@@ -54,9 +54,9 @@ test("Singapore slot string", () => {
 
 test("fills rain for ended slots, one API day at a time", async () => {
   const DB = fakeD1();
-  addRide(DB, "a", "Tampines", "2026-11-21T18:00"); // east gauge got 1.2 mm -> 1
-  addRide(DB, "b", "City Hall", "2026-11-21T18:00"); // central gauge 0 mm -> 0
-  addRide(DB, "c", "Tampines", "2026-11-21T08:00"); // second page, dry -> 0
+  addRide(DB, "a", "Tampines", "2026-11-21T18:00"); // east gauge got 1.2 mm
+  addRide(DB, "b", "City Hall", "2026-11-21T18:00"); // central gauge 0 mm
+  addRide(DB, "c", "Tampines", "2026-11-21T08:00"); // second page, dry
   addRide(DB, "d", "Tampines", "2026-11-21T20:00"); // no readings -> stays NULL
   addRide(DB, "e", "Nowhere", "2026-11-21T18:00"); // unknown station -> stays NULL
   addRide(DB, "f", "Tampines", "2026-11-22T09:00"); // slot not ended yet -> not checked
@@ -64,8 +64,8 @@ test("fills rain for ended slots, one API day at a time", async () => {
   const now = Date.parse("2026-11-22T01:10:00Z"); // 09:10 in Singapore
   const s = await runRainJob({ DB }, { fetch: fakeFetch(calls), coords, now });
   assert.deepEqual(s, { checked: 5, updated: 3, noReading: 1, noStation: 1, failedDays: [] });
-  const rain = Object.fromEntries(DB.db.prepare("SELECT id, rain FROM rides").all().map((r) => [r.id, r.rain]));
-  assert.deepEqual(rain, { a: 1, b: 0, c: 0, d: null, e: null, f: null });
+  const rain = Object.fromEntries(DB.db.prepare("SELECT id, rain_mm FROM rides").all().map((r) => [r.id, r.rain_mm]));
+  assert.deepEqual(rain, { a: 1.2, b: 0, c: 0, d: null, e: null, f: null });
   assert.equal(calls.length, 2);
   assert.match(calls[1], /paginationToken=p2/);
 });
@@ -75,5 +75,5 @@ test("a failing API day leaves rows untouched", async () => {
   addRide(DB, "x", "Tampines", "2026-11-20T18:00");
   const s = await runRainJob({ DB }, { fetch: fakeFetch([]), coords, now: Date.parse("2026-11-22T00:00:00Z") });
   assert.deepEqual(s.failedDays, ["2026-11-20"]);
-  assert.equal(DB.db.prepare("SELECT rain FROM rides").get().rain, null);
+  assert.equal(DB.db.prepare("SELECT rain_mm FROM rides").get().rain_mm, null);
 });
