@@ -5,7 +5,7 @@ const { createWorker } = require("../worker/app.js");
 
 const data = {
   stations: [{ name: "Tampines", lat: 1.35, lng: 103.94 }, { name: "City Hall", lat: 1.29, lng: 103.85 }],
-  distances: { metres: { Tampines: { "City Hall": 17000 }, "City Hall": { Tampines: 17000 } } },
+  distances: { version: "test-v1", metres: { Tampines: { "City Hall": 17000 }, "City Hall": { Tampines: 17000 } } },
 };
 
 function fakeDB(rows) {

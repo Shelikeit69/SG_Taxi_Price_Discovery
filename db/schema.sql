@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS rides (
   booked_fare_sgd  REAL NOT NULL CHECK (booked_fare_sgd > 0),
   discount_flag    INTEGER NOT NULL DEFAULT 0 CHECK (discount_flag IN (0, 1)),
   benchmark_sgd    REAL NOT NULL CHECK (benchmark_sgd > 0),  -- reference fare for the final route
-  formula_version  TEXT NOT NULL,                   -- rate table and waiting-share version
+  formula_version  TEXT NOT NULL,                   -- "<rate table version>+<distance table version>", e.g. 2026-11-21+placeholder-straight-x1.3
   rain_mm          REAL CHECK (rain_mm >= 0),  -- mm at the nearest gauge over the 15-minute slot, matched later from public rainfall data; NULL until matched or if the gauge had no readings
   CHECK (origin_station <> dest_station)
 );

@@ -24,6 +24,7 @@ What is in the repository today:
 | `src/text.js` | All page text, in English and Chinese; the page follows the browser language and has a switch button. A test fails if the two languages fall out of step |
 | `web/` | Fare page (needs `web/data/stations.json` and `web/data/distances.json`, not committed) |
 | `src/stations.js`, `scripts/build_stations.js` | Builds `web/data/stations.json` from LTA's MRT Station Exit GeoJSON (data.gov.sg, Singapore Open Data Licence v1.0); MRT and LRT stations, same-name interchanges merged |
+| `src/distances.js`, `scripts/build_placeholder_distances.js` | Builds a **placeholder** `web/data/distances.json` (straight line × 1.3, version `placeholder-straight-x1.3`) until the road-distance table is ready. The page shows a notice while it is in use, and each ride stores the table version in `formula_version` (`<rates>+<distances>`) so these rides can be re-priced later |
 | `db/schema.sql` | Database table for fare submissions (Cloudflare D1) |
 | `src/submission.js` | Format checks for a submission before it is stored |
 | `worker/submit.js` | Submission handler for the Cloudflare Worker (not deployed) |

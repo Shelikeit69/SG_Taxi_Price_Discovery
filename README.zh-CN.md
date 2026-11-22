@@ -33,6 +33,7 @@
 | `src/text.js` | 页面上的全部文字，中英两套；页面默认跟随浏览器语言，可一键切换。两种语言的条目对不上时，测试会失败 |
 | `web/` | 计算页（需要 `web/data/stations.json` 和 `web/data/distances.json`，不提交进仓库） |
 | `src/stations.js`、`scripts/build_stations.js` | 用 LTA 地铁站出口 GeoJSON（data.gov.sg，新加坡开放数据许可 1.0 版）生成 `web/data/stations.json`；含地铁站和轻轨站，同名换乘站合并为一个 |
+| `src/distances.js`、`scripts/build_placeholder_distances.js` | 在道路距离表做好之前，生成**占位的** `web/data/distances.json`（直线距离 × 1.3，版本 `placeholder-straight-x1.3`）。使用期间页面会显示提示；每条记录在 `formula_version` 里存下距离表版本（`<费率>+<距离表>`），以后可以重算这些记录的参考价 |
 | `db/schema.sql` | 存放提交记录的数据表（Cloudflare D1） |
 | `src/submission.js` | 提交记录入库前的格式检查 |
 | `worker/submit.js` | Cloudflare Worker 的提交处理函数（未部署） |

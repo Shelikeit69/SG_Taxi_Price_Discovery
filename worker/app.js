@@ -3,15 +3,16 @@
 
 const { handleSubmit } = require("./submit.js");
 const { runRainJob } = require("./rainjob.js");
+const { distanceVersion } = require("../src/distances.js");
 
 const JSON_HEADERS = { "content-type": "application/json; charset=utf-8" };
 
 // data.stations:  [{ name, lat, lng }]
-// data.distances: { metres: { origin: { dest: metres } } }
+// data.distances: { version, metres: { origin: { dest: metres } } }; a table without a version is refused
 function createWorker(data, uuid = () => crypto.randomUUID()) {
   const stations = new Set(data.stations.map((s) => s.name));
   const table = data.distances.metres;
-  const deps = { stations, metres: (a, b) => table[a] && table[a][b], uuid };
+  const deps = { stations, metres: (a, b) => table[a] && table[a][b], distanceVersion: distanceVersion(data.distances), uuid };
 
   const coords = new Map(data.stations.map((s) => [s.name, { lat: s.lat, lng: s.lng }]));
 
