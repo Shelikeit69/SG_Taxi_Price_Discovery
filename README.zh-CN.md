@@ -32,6 +32,7 @@
 | `src/route.js` | 找最近的站；路线在手机上保存 6 小时 |
 | `src/text.js` | 页面上的全部文字 |
 | `web/` | 计算页（需要 `web/data/stations.json` 和 `web/data/distances.json`，不提交进仓库） |
+| `src/stations.js`、`scripts/build_stations.js` | 用 LTA 地铁站出口 GeoJSON（data.gov.sg，新加坡开放数据许可 1.0 版）生成 `web/data/stations.json`；只收 MRT 站 |
 | `db/schema.sql` | 存放提交记录的数据表（Cloudflare D1） |
 | `src/submission.js` | 提交记录入库前的格式检查 |
 | `worker/submit.js` | Cloudflare Worker 的提交处理函数（未部署） |

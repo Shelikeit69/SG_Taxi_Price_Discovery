@@ -3,7 +3,7 @@
 
 const TEXT = {
   title: "Singapore taxi reference fare",
-  intro: "Pick two MRT/LRT stations. The page works out the street-hail meter fare from published ComfortDelGro rates. Compare it with your ride-hailing quote.",
+  intro: "Pick two MRT stations. The page works out the street-hail meter fare from published ComfortDelGro rates. Compare it with your ride-hailing quote.",
   from: "From",
   to: "To",
   choose: "Choose a station",
