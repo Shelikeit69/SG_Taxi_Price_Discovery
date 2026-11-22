@@ -108,6 +108,8 @@ python3 scripts/build_page.py data/raw/package/dist/leaflet.css mapdata.json bui
 
 其他一概不存：账号、手机号、姓名、设备 ID、IP 地址、定位、精确时间。IP 只用于频率限制，不保存。定位只在你点按钮时读取，留在浏览器里。提交功能还没上线，Worker 尚未部署。
 
+每月公开的文件不含记录编号，各行按乘车时间排列，看不出谁先提交。某个站点对当月不足 5 条时，公开文件里只显示片区，不显示站名。
+
 ## 📄 许可
 
 代码：[MIT](LICENSE)。公开发布的车费数据将采用 CC BY 4.0。
