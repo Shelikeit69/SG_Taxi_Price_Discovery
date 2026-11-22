@@ -23,6 +23,7 @@ What is in the repository today:
 | `src/route.js` | Nearest station and the route saved on the phone for 6 hours |
 | `src/text.js` | All page text in one place |
 | `web/` | Fare page (needs `web/data/stations.json` and `web/data/distances.json`, not committed) |
+| `src/stations.js`, `scripts/build_stations.js` | Builds `web/data/stations.json` from LTA's MRT Station Exit GeoJSON (data.gov.sg, Singapore Open Data Licence v1.0); MRT and LRT stations, same-name interchanges merged |
 | `db/schema.sql` | Database table for fare submissions (Cloudflare D1) |
 | `src/submission.js` | Format checks for a submission before it is stored |
 | `worker/submit.js` | Submission handler for the Cloudflare Worker (not deployed) |
