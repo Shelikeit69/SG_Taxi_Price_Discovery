@@ -117,3 +117,27 @@ test("result area wording (Toni, 2026-11-22)", () => {
   assert.equal(TEXTS.en.noData, "The data did not load. Refresh the page and try again.");
   for (const lang of ["en", "zh"]) assert.ok(!/stations\.json|distances\.json/.test(TEXTS[lang].noData));
 });
+
+test("consent links the CC BY 4.0 summary and the README privacy section, per language", () => {
+  const join = (c) => c.before + c.licence + c.middle + c.privacy + c.after;
+  assert.equal(join(TEXTS.zh.consent), "提交即表示你同意以 CC BY 4.0 许可 公开这条记录。记录里没有账号、手机号这类能直接认出你的信息（具体存了什么）。");
+  assert.equal(join(TEXTS.en.consent), "By submitting, you agree to publish this record under the CC BY 4.0 licence. It holds nothing that directly identifies you, such as an account or phone number (what is stored).");
+  assert.equal(text.LICENCE_URL.zh, "https://creativecommons.org/licenses/by/4.0/deed.zh-hans");
+  assert.equal(text.LICENCE_URL.en, "https://creativecommons.org/licenses/by/4.0/deed.en");
+  for (const lang of ["en", "zh"]) {
+    assert.equal(TEXTS[lang].stored, undefined);
+    assert.equal(TEXTS[lang].notStored, undefined);
+  }
+  assert.ok(TEXTS.zh.streetHailHint.includes("计价器"));
+});
+
+test("README privacy headings that the page links to still exist", () => {
+  const fs = require("node:fs");
+  const path = require("node:path");
+  const root = path.join(__dirname, "..");
+  // #privacy and #-隐私 are GitHub's anchors for these headings.
+  assert.match(fs.readFileSync(path.join(root, "README.md"), "utf8"), /^## Privacy$/m);
+  assert.match(fs.readFileSync(path.join(root, "README.zh-CN.md"), "utf8"), /^## 🔒 隐私$/m);
+  assert.ok(text.PRIVACY_URL.en.endsWith("README.md#privacy"));
+  assert.equal(decodeURIComponent(text.PRIVACY_URL.zh.split("#")[1]), "-隐私");
+});

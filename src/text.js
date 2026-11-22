@@ -6,6 +6,13 @@
 const FARES_URL = "https://www.cdgtaxi.com.sg/fares/";
 // National map by SLA; SLA says pages may hyperlink to it at this address.
 const ONEMAP_URL = "https://www.onemap.sg/";
+// CC BY 4.0 plain-language summary (deed) in each page language; each links the full legal code.
+const LICENCE_URL = { en: "https://creativecommons.org/licenses/by/4.0/deed.en", zh: "https://creativecommons.org/licenses/by/4.0/deed.zh-hans" };
+// What is stored and not stored: the Privacy section of each README (lists every column, links db/schema.sql).
+const PRIVACY_URL = {
+  en: "https://github.com/Shelikeit69/SG_Taxi_Price_Discovery/blob/main/README.md#privacy",
+  zh: "https://github.com/Shelikeit69/SG_Taxi_Price_Discovery/blob/main/README.zh-CN.md#-%E9%9A%90%E7%A7%81",
+};
 
 const TEXTS = {
   en: {
@@ -58,10 +65,13 @@ const TEXTS = {
     discount: "I used a voucher or subscription discount",
     rideTimeNote: (date, time) => `Ride time recorded as ${date} ${time}, rounded down to 15 minutes. Change the time above if needed.`,
     noSavedRoute: "No saved check time on this phone, so the time above is used. Please check it.",
-    consent: "Submitting means you agree to publish this record, without anything that identifies you, under CC BY 4.0.",
-    storedTitle: "What is stored",
-    stored: "Start and end station, ride time rounded to 15 minutes, platform, the price, the discount tick, and the reference fare.",
-    notStored: "Not stored: account, phone number, name, device ID, IP address, location, exact time.",
+    consent: {
+      before: "By submitting, you agree to publish this record under the ",
+      licence: "CC BY 4.0 licence",
+      middle: ". It holds nothing that directly identifies you, such as an account or phone number (",
+      privacy: "what is stored",
+      after: ").",
+    },
     submit: "Submit",
     submitting: "Sending…",
     submitted: "Thanks. Your record was saved, and the route on this phone was cleared.",
@@ -119,14 +129,17 @@ const TEXTS = {
     platform: "平台",
     platforms: { grab: "Grab", gojek: "Gojek", tada: "TADA", geolah: "Geolah", ryde: "Ryde", cdg_zig: "CDG Zig", street_hail: "路边拦的德士" },
     bookedFare: "下单价格（新元）",
-    streetHailHint: "路边拦的德士：填咪表上的金额，不含刷卡或电子钱包手续费。",
+    streetHailHint: "路边拦的德士：填计价器上的金额，不含刷卡或电子钱包手续费。",
     discount: "我用了优惠券或订阅折扣",
     rideTimeNote: (date, time) => `乘车时间记为 ${date} ${time}，向下取整到 15 分钟。时间不对的话，在上面改。`,
     noSavedRoute: "这部手机上没有存查价时间，所以用上面的时间，请核对。",
-    consent: "提交即表示你同意以 CC BY 4.0 许可公开这条记录，记录里没有任何能认出你的信息。",
-    storedTitle: "存了什么",
-    stored: "起点站、终点站、取整到 15 分钟的乘车时间、平台、价格、优惠勾选，以及正常参考价。",
-    notStored: "不存：账号、手机号、姓名、设备 ID、IP 地址、定位、精确时间。",
+    consent: {
+      before: "提交即表示你同意以 ",
+      licence: "CC BY 4.0 许可",
+      middle: " 公开这条记录。记录里没有账号、手机号这类能直接认出你的信息（",
+      privacy: "具体存了什么",
+      after: "）。",
+    },
     submit: "提交",
     submitting: "正在提交…",
     submitted: "谢谢，记录已保存，这部手机上的路线也已清除。",
@@ -198,4 +211,4 @@ function setLang(l) {
   return lang;
 }
 
-if (typeof module !== "undefined") module.exports = { TEXTS, FARES_URL, ONEMAP_URL, PLACE, premiumPct, money, formatDistance, surchargeNote, pickLang, setLang, LANG_KEY, get TEXT() { return TEXT; } };
+if (typeof module !== "undefined") module.exports = { TEXTS, FARES_URL, ONEMAP_URL, LICENCE_URL, PRIVACY_URL, PLACE, premiumPct, money, formatDistance, surchargeNote, pickLang, setLang, LANG_KEY, get TEXT() { return TEXT; } };
