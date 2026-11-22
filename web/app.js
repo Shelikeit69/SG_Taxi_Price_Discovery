@@ -13,19 +13,24 @@
   let stations = [];
   let distances = {};
 
+  // Fills el with parts.before, a link opening url in a new tab, parts.after.
+  function linked(el, parts, url) {
+    const a = document.createElement("a");
+    a.href = url;
+    a.target = "_blank";
+    a.rel = "noopener";
+    a.textContent = parts.link;
+    el.replaceChildren(parts.before, a, parts.after);
+  }
+
   function setText() {
     document.documentElement.lang = lang === "zh" ? "zh-Hans" : "en";
     $("langBtn").textContent = TEXT.langSwitch;
     document.title = TEXT.title;
     $("title").textContent = TEXT.title;
-    // Intro with one link to the CDG fare page; built from nodes, no innerHTML.
-    const intro = $("intro");
-    const link = document.createElement("a");
-    link.href = FARES_URL;
-    link.target = "_blank";
-    link.rel = "noopener";
-    link.textContent = TEXT.intro.link;
-    intro.replaceChildren(TEXT.intro.before, link, TEXT.intro.after);
+    // Sentences with one outside link, built from nodes (no innerHTML).
+    linked($("intro"), TEXT.intro, FARES_URL);
+    linked($("destHint"), TEXT.destHint, ONEMAP_URL);
     $("fromLabel").textContent = TEXT.from;
     $("toLabel").textContent = TEXT.to;
     $("locate").textContent = TEXT.locate;
