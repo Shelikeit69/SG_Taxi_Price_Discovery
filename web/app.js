@@ -268,7 +268,9 @@
     $("day").value = now.day;
     try {
       await loadData();
-    } catch {
+    } catch (err) {
+      // The page needs data/stations.json and data/distances.json next to it.
+      console.error("Could not load data/stations.json or data/distances.json", err);
       $("message").textContent = TEXT.noData;
       $("message").className = "warn";
       for (const id of ["origin", "dest", "locate", "time", "day", "platform", "bookedFare", "discount", "submitBtn"]) $(id).disabled = true;

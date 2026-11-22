@@ -78,14 +78,14 @@ test("premium after submitting", () => {
   assert.equal(premiumPct(20, 0), null);
   assert.equal(TEXTS.en.premium(18), "This booking is 18% above the reference fare.");
   assert.equal(TEXTS.en.premium(-8), "This booking is 8% below the reference fare.");
-  assert.equal(TEXTS.zh.premium(18), "这单比参考车费高 18%。");
-  assert.equal(TEXTS.zh.premium(-8), "这单比参考车费低 8%。");
-  assert.equal(TEXTS.zh.premium(0), "这单和参考车费差不多。");
+  assert.equal(TEXTS.zh.premium(18), "这单比正常参考价高 18%。");
+  assert.equal(TEXTS.zh.premium(-8), "这单比正常参考价低 8%。");
+  assert.equal(TEXTS.zh.premium(0), "这单和正常参考价差不多。");
 });
 
 test("comparison sentence states the sample size and that rain is not considered", () => {
   assert.equal(TEXTS.en.comparison(12, 25), "Of 12 earlier rides on the same platform in the same time band (rain not considered), 25% were cheaper relative to the reference fare.");
-  assert.equal(TEXTS.zh.comparison(12, 25), "同平台、同时段的 12 条记录里（不分是否下雨），有 25% 比这单划算（按与参考车费的比例算）。");
+  assert.equal(TEXTS.zh.comparison(12, 25), "同平台、同时段的 12 条记录里（不分是否下雨），有 25% 比这单划算（按与正常参考价的比例算）。");
 });
 
 test("intro links ComfortDelGro to the CDG fare page in both languages", () => {
@@ -107,4 +107,13 @@ test("destination hint links OneMap for a postcode search, in both languages", (
   assert.equal(zh.before + zh.link + zh.after, "不知道终点附近是哪个站？在 OneMap 里输入邮编，看 Nearby 里的 MRT Station。");
   const en = TEXTS.en.destHint;
   assert.equal(en.before + en.link + en.after, "Not sure which station is near your destination? Search the postcode on OneMap and check MRT Station under Nearby.");
+});
+
+test("result area wording (Toni, 2026-11-22)", () => {
+  assert.equal(TEXTS.zh.result, "正常参考价");
+  assert.equal(TEXTS.zh.band.peak, "高峰：打表价 × 1.25");
+  assert.equal(TEXTS.zh.band.night, "深夜：打表价 × 1.5");
+  assert.equal(TEXTS.zh.noData, "数据没加载出来，请刷新页面再试。");
+  assert.equal(TEXTS.en.noData, "The data did not load. Refresh the page and try again.");
+  for (const lang of ["en", "zh"]) assert.ok(!/stations\.json|distances\.json/.test(TEXTS[lang].noData));
 });
