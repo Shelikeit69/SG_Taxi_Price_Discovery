@@ -83,9 +83,9 @@ test("premium after submitting", () => {
   assert.equal(TEXTS.zh.premium(0), "这单和正常参考价差不多。");
 });
 
-test("comparison sentence states the sample size and that rain is not considered", () => {
-  assert.equal(TEXTS.en.comparison(12, 25), "Of 12 earlier rides on the same platform in the same time band (rain not considered), 25% were cheaper relative to the reference fare.");
-  assert.equal(TEXTS.zh.comparison(12, 25), "同平台、同时段的 12 条记录里（不分是否下雨），有 25% 比这单划算（按与正常参考价的比例算）。");
+test("comparison sentence states the sample size and that routes and rain are mixed", () => {
+  assert.equal(TEXTS.en.comparison(12, 25), "Of 12 earlier rides on the same platform in the same time band, 25% were cheaper. Compared by the ratio to the reference fare, across all routes, rain or not.");
+  assert.equal(TEXTS.zh.comparison(12, 25), "同平台、同时段的 12 条记录里，有 25% 比这单划算。按与正常参考价的比例算，不分路线和是否下雨。");
 });
 
 test("intro links ComfortDelGro to the CDG fare page in both languages", () => {
