@@ -87,3 +87,16 @@ test("comparison sentence states the sample size and that rain is not considered
   assert.equal(TEXTS.en.comparison(12, 25), "Of 12 earlier rides on the same platform in the same time band (rain not considered), 25% were cheaper relative to the reference fare.");
   assert.equal(TEXTS.zh.comparison(12, 25), "同平台、同时段的 12 条记录里（不分是否下雨），有 25% 比这单划算（按与参考车费的比例算）。");
 });
+
+test("intro links ComfortDelGro to the CDG fare page in both languages", () => {
+  assert.equal(text.FARES_URL, "https://www.cdgtaxi.com.sg/fares/");
+  for (const lang of ["en", "zh"]) {
+    const i = TEXTS[lang].intro;
+    assert.equal(i.link, "ComfortDelGro");
+    assert.ok(i.before.length > 0 && i.after.length > 0);
+  }
+  assert.equal(TEXTS.zh.intro.before + TEXTS.zh.intro.link + TEXTS.zh.intro.after, "选离起点和终点最近的两个站，页面会按 ComfortDelGro 公布的费率算出在路边直接拦普通德士的车费。拿它对照你最常用的打车 App 的报价。");
+  assert.equal(TEXTS.zh.title, "新加坡打车正常参考价");
+  assert.equal(TEXTS.en.title, "Singapore taxi fare reference");
+  assert.equal(TEXTS.zh.day, "工作日还是周末/假期");
+});

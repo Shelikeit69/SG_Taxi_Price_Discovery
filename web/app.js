@@ -18,7 +18,14 @@
     $("langBtn").textContent = TEXT.langSwitch;
     document.title = TEXT.title;
     $("title").textContent = TEXT.title;
-    $("intro").textContent = TEXT.intro;
+    // Intro with one link to the CDG fare page; built from nodes, no innerHTML.
+    const intro = $("intro");
+    const link = document.createElement("a");
+    link.href = FARES_URL;
+    link.target = "_blank";
+    link.rel = "noopener";
+    link.textContent = TEXT.intro.link;
+    intro.replaceChildren(TEXT.intro.before, link, TEXT.intro.after);
     $("fromLabel").textContent = TEXT.from;
     $("toLabel").textContent = TEXT.to;
     $("locate").textContent = TEXT.locate;
