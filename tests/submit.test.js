@@ -157,3 +157,13 @@ test("weekend band uses the ride's own day type", async () => {
   const weekendPeak = await handleSubmit(req({ ...body, rideTime: "2026-11-29T11:00", day: "we" }), { DB }, deps);
   assert.equal((await weekendPeak.json()).comparison.n, 10);
 });
+
+test("a failed comparison read does not stop the ride from being saved", async () => {
+  const DB = fakeD1();
+  const real = DB.prepare.bind(DB);
+  DB.prepare = (sql) => (sql.startsWith("SELECT") ? { bind: () => ({ all: async () => { throw new Error("read failed"); } }) } : real(sql));
+  const res = await handleSubmit(req(body), { DB }, deps);
+  assert.equal(res.status, 201);
+  assert.deepEqual(await res.json(), { ok: true, benchmark: 23.17 });
+  assert.equal(DB.db.prepare("SELECT COUNT(*) AS n FROM rides").get().n, 1);
+});

@@ -66,16 +66,22 @@ async function handleSubmit(request, env, deps) {
   // Earlier rides only: read before this ride is inserted.
   const [label] = mult(minutes, input.day);
   const rideBand = label === "深夜" ? "night" : label === "高峰" ? "peak" : "offpeak";
-  const earlier = await env.DB.prepare(
-    "SELECT booked_fare_sgd, benchmark_sgd, ride_time_15min, discount_flag FROM rides WHERE platform = ? AND discount_flag = 0"
-  )
-    .bind(r.platform)
-    .all();
-  const comparison = submitComparison(
-    { ratio: r.booked_fare_sgd / benchmark, band: rideBand, discount: r.discount_flag === 1 },
-    earlier.results || [],
-    deps.holidays
-  );
+  // The comparison is extra information: if reading fails, the ride is still saved.
+  let comparison = null;
+  try {
+    const earlier = await env.DB.prepare(
+      "SELECT booked_fare_sgd, benchmark_sgd, ride_time_15min, discount_flag FROM rides WHERE platform = ? AND discount_flag = 0"
+    )
+      .bind(r.platform)
+      .all();
+    comparison = submitComparison(
+      { ratio: r.booked_fare_sgd / benchmark, band: rideBand, discount: r.discount_flag === 1 },
+      earlier.results || [],
+      deps.holidays
+    );
+  } catch {
+    comparison = null;
+  }
 
   const row = { id: deps.uuid(), ...r, benchmark_sgd: benchmark, formula_version: RATES.version, rain_mm: null };
   await env.DB.prepare(
