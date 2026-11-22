@@ -89,12 +89,18 @@
       if (res.status === 201) {
         if (storage) clearRoute(storage);
         let reference = null;
+        let comparison = null;
         try {
-          reference = (await res.json()).benchmark;
+          const body = await res.json();
+          reference = body.benchmark;
+          comparison = body.comparison || null;
         } catch {}
         // Compare with the reference fare the server worked out for the saved record.
         const pct = premiumPct(Number(payload.bookedFare), reference);
-        status.textContent = pct === null ? TEXT.submitted : TEXT.submitted + TEXT.sentenceGap + TEXT.premium(pct);
+        let message = pct === null ? TEXT.submitted : TEXT.submitted + TEXT.sentenceGap + TEXT.premium(pct);
+        // Only present once the server found at least 10 comparable rides.
+        if (pct !== null && comparison && comparison.n > 0) message += TEXT.sentenceGap + TEXT.comparison(comparison.n, comparison.cheaperPct);
+        status.textContent = message;
         status.className = "ok";
         $("bookedFare").value = "";
         $("discount").checked = false;

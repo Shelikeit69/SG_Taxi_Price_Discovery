@@ -13,7 +13,7 @@ function fakeD1() {
     db,
     prepare(sql) {
       const stmt = db.prepare(sql);
-      return { bind: (...args) => ({ run: async () => stmt.run(...args) }) };
+      return { bind: (...args) => ({ run: async () => stmt.run(...args), all: async () => ({ results: stmt.all(...args) }) }) };
     },
   };
 }
@@ -83,4 +83,77 @@ test("rate limiter is keyed by IP and blocks before reading the body", async () 
   assert.equal((await handleSubmit(req(body), env, deps)).status, 429);
   assert.deepEqual(seen, ["203.0.113.9", "203.0.113.9", "203.0.113.9", "203.0.113.9"]);
   assert.equal(DB.db.prepare("SELECT COUNT(*) AS n FROM rides").get().n, 3);
+});
+
+// Second line of the after-submit feedback: comparison with earlier rides on
+// the same platform and time band, rain not considered (decided 2026-11-22).
+function seed(DB, rows) {
+  const ins = DB.db.prepare(
+    "INSERT INTO rides (id, origin_station, dest_station, ride_time_15min, platform, booked_fare_sgd, discount_flag, benchmark_sgd, formula_version, rain_mm) VALUES (?, 'Tampines', 'City Hall', ?, ?, ?, ?, 20, 'x', ?)"
+  );
+  rows.forEach((r, i) => ins.run(`seed-${i}`, r.slot, r.platform || "grab", r.fare, r.discount ? 1 : 0, r.rain === undefined ? null : r.rain));
+}
+
+// 10 weekday-peak Grab rides with ratios 1.0, 1.1, ... 1.9 (benchmark $20).
+const peakTen = Array.from({ length: 10 }, (_, i) => ({ slot: "2026-11-24T18:00", fare: 20 * (1 + i / 10), rain: i % 2 ? 0 : 3.4 }));
+
+test("comparison appears at 10 comparable rides, mixing rain and no rain", async () => {
+  const DB = fakeD1();
+  seed(DB, peakTen);
+  // Ratio 28.4 / 23.17 = 1.2257: cheaper rides are 1.0, 1.1, 1.2 -> 3 of 10.
+  const res = await handleSubmit(req(body), { DB }, deps);
+  assert.deepEqual(await res.json(), { ok: true, benchmark: 23.17, comparison: { n: 10, cheaperPct: 30 } });
+});
+
+test("no comparison below 10 comparable rides", async () => {
+  const DB = fakeD1();
+  seed(DB, peakTen.slice(0, 9));
+  const res = await handleSubmit(req(body), { DB }, deps);
+  assert.deepEqual(await res.json(), { ok: true, benchmark: 23.17 });
+});
+
+test("other platforms, other time bands and discounted rides are not counted", async () => {
+  const DB = fakeD1();
+  seed(DB, [
+    ...peakTen.slice(0, 9),
+    { slot: "2026-11-24T18:00", fare: 20, platform: "gojek" }, // other platform
+    { slot: "2026-11-24T12:00", fare: 20 }, // weekday off-peak
+    { slot: "2026-11-24T02:00", fare: 20 }, // late night
+    { slot: "2026-11-24T18:00", fare: 20, discount: true }, // discounted
+  ]);
+  const res = await handleSubmit(req(body), { DB }, deps);
+  assert.equal((await res.json()).comparison, undefined);
+});
+
+test("rides whose rain_mm is still empty are counted", async () => {
+  const DB = fakeD1();
+  seed(DB, peakTen.map((r) => ({ ...r, rain: undefined })));
+  const res = await handleSubmit(req(body), { DB }, deps);
+  assert.deepEqual((await res.json()).comparison, { n: 10, cheaperPct: 30 });
+});
+
+test("a discounted ride gets no comparison", async () => {
+  const DB = fakeD1();
+  seed(DB, peakTen);
+  const res = await handleSubmit(req({ ...body, discount: true }), { DB }, deps);
+  assert.deepEqual(await res.json(), { ok: true, benchmark: 23.17 });
+});
+
+test("the ride is compared only with earlier rides, not with itself", async () => {
+  const DB = fakeD1();
+  seed(DB, peakTen.slice(0, 9));
+  await handleSubmit(req(body), { DB }, deps); // 10th comparable ride, no comparison yet
+  const res = await handleSubmit(req(body), { DB }, deps);
+  // Earlier ratios: 1.0 ... 1.8 and 1.2257 (the first submission). Strictly lower: 1.0, 1.1, 1.2 -> 3 of 10.
+  assert.deepEqual((await res.json()).comparison, { n: 10, cheaperPct: 30 });
+});
+
+test("weekend band uses the ride's own day type", async () => {
+  const DB = fakeD1();
+  // 2026-11-28 is a Saturday: 11:00 is weekend peak.
+  seed(DB, Array.from({ length: 10 }, (_, i) => ({ slot: "2026-11-28T11:00", fare: 20 * (1 + i / 10) })));
+  const weekdayOffPeak = await handleSubmit(req({ ...body, rideTime: "2026-11-24T11:00", day: "wd" }), { DB }, deps);
+  assert.equal((await weekdayOffPeak.json()).comparison, undefined);
+  const weekendPeak = await handleSubmit(req({ ...body, rideTime: "2026-11-29T11:00", day: "we" }), { DB }, deps);
+  assert.equal((await weekendPeak.json()).comparison.n, 10);
 });
