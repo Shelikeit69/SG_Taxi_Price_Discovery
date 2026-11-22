@@ -52,7 +52,7 @@ Reference fare = (flag-down + distance + waiting) × (1 + time-band surcharge) +
 | Peak | +25%: weekdays 6:00-9:29, weekends and public holidays 10:00-13:59, every day 17:00-23:59 |
 | Late night | +50%: 0:00-5:59 |
 
-The $0.27 rates include a temporary $0.01 surcharge that runs until 2027-02-28. Waiting time is not measured; it is estimated as 10% of the distance charge off-peak and 20% at peak, to be calibrated later against submitted street-hail fares. Late night uses 10% for now; this has not been confirmed.
+The $0.27 rates include a temporary $0.01 surcharge that runs until 2027-02-28. Waiting time is not measured; it is estimated as 10% of the distance charge off-peak and 20% at peak, to be calibrated later against submitted street-hail fares. Late night also uses 10%. No public data gives the waiting share, so all three figures are assumptions until calibrated.
 
 Worked example: Tampines to City Hall, taking the road distance as 17 km, is $17.37 off-peak and $23.17 at peak. Amounts are rounded to the cent only at the end.
 
