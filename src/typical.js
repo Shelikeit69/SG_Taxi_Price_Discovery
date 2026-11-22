@@ -34,26 +34,30 @@ function quantile(sorted, q) {
 
 const round3 = (x) => Math.round(x * 1000) / 1000;
 
-// rows: database rows; options.holidays: array of "YYYY-MM-DD";
-// options.excludeDiscounted: leave out rides with discount_flag = 1.
+// rows: database rows; options.holidays: array of "YYYY-MM-DD".
+// Rides with a voucher or subscription discount (discount_flag = 1) are left
+// out by default: a discount is personal, not the platform's price for
+// everyone. Each group reports how many were left out (discountedLeftOut).
+// options.includeDiscounted: true puts them back in.
 function typicalRatios(rows, options = {}) {
   const holidays = new Set(options.holidays || []);
   const groups = new Map();
   for (const r of rows) {
     if (r.rain !== 0 && r.rain !== 1) continue;
-    if (options.excludeDiscounted && r.discount_flag === 1) continue;
     if (!(r.benchmark_sgd > 0)) continue;
     const key = `${r.platform}|${band(r.ride_time_15min, holidays)}|${r.rain}`;
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key).push(r.booked_fare_sgd / r.benchmark_sgd);
+    if (!groups.has(key)) groups.set(key, { ratios: [], discountedLeftOut: 0 });
+    const g = groups.get(key);
+    if (r.discount_flag === 1 && !options.includeDiscounted) g.discountedLeftOut += 1;
+    else g.ratios.push(r.booked_fare_sgd / r.benchmark_sgd);
   }
 
   const out = [];
-  for (const [key, ratios] of groups) {
+  for (const [key, { ratios, discountedLeftOut }] of groups) {
     const [platform, b, rain] = key.split("|");
     const n = ratios.length;
     const status = n < MIN_SHOWN ? "insufficient" : n < MIN_NORMAL ? "preliminary" : "normal";
-    const g = { platform, band: b, rain: Number(rain), n, status };
+    const g = { platform, band: b, rain: Number(rain), n, status, discountedLeftOut };
     if (status !== "insufficient") {
       const s = [...ratios].sort((a, c) => a - c);
       g.median = round3(quantile(s, 0.5));

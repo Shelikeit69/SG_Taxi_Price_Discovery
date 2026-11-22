@@ -27,7 +27,7 @@ test("thresholds: under 10 hidden, 10-29 preliminary, 30+ normal", () => {
   for (let i = 0; i < 10; i++) rows.push(ride("gojek", "2026-11-23T12:00", 20 + i));
   for (let i = 0; i < 30; i++) rows.push(ride("grab", "2026-11-23T18:00", 30));
   const g = Object.fromEntries(typicalRatios(rows).map((x) => [x.platform, x]));
-  assert.deepEqual(g.tada, { platform: "tada", band: "offpeak", rain: 0, n: 9, status: "insufficient" });
+  assert.deepEqual(g.tada, { platform: "tada", band: "offpeak", rain: 0, n: 9, status: "insufficient", discountedLeftOut: 0 });
   assert.equal(g.gojek.status, "preliminary");
   assert.equal(g.gojek.median, 1.225); // ratios 1.00 .. 1.45
   assert.equal(g.gojek.p25, 1.113);
@@ -37,16 +37,20 @@ test("thresholds: under 10 hidden, 10-29 preliminary, 30+ normal", () => {
   assert.equal(g.grab.median, 1.5);
 });
 
-test("rain splits groups; unmatched rain and optional discount filter", () => {
+test("rain splits groups; unmatched rain left out; discounts left out by default", () => {
   const rows = [
     ...Array.from({ length: 10 }, () => ride("grab", "2026-11-23T12:00", 20, { rain: 1 })),
     ...Array.from({ length: 10 }, () => ride("grab", "2026-11-23T12:00", 22, { rain: 0, discount_flag: 1 })),
     ride("grab", "2026-11-23T12:00", 99, { rain: null }),
   ];
-  const all = typicalRatios(rows);
-  assert.equal(all.length, 2);
-  assert.ok(all.every((g) => g.n === 10));
-  const noDiscount = typicalRatios(rows, { excludeDiscounted: true });
-  assert.equal(noDiscount.length, 1);
-  assert.equal(noDiscount[0].rain, 1);
+  const byRain = (gs, rain) => gs.find((g) => g.rain === rain);
+  const dflt = typicalRatios(rows);
+  assert.equal(dflt.length, 2);
+  assert.equal(byRain(dflt, 1).n, 10);
+  assert.equal(byRain(dflt, 1).discountedLeftOut, 0);
+  assert.equal(byRain(dflt, 0).n, 0);
+  assert.equal(byRain(dflt, 0).status, "insufficient");
+  assert.equal(byRain(dflt, 0).discountedLeftOut, 10);
+  const all = typicalRatios(rows, { includeDiscounted: true });
+  assert.ok(all.every((g) => g.n === 10 && g.discountedLeftOut === 0));
 });
