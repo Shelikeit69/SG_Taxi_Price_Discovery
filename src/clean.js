@@ -80,6 +80,16 @@ function cleanMonth(rows, regions, options = {}) {
   });
   if (missingRegion.size) throw new Error(`no region for: ${[...missingRegion].sort().join(", ")}`);
 
+  // Publish in a fixed order that does not follow submission order, so the
+  // file does not reveal who submitted before whom. Duplicates were already
+  // removed above, while rows were still in insertion order.
+  const keyOf = (r) => [r.ride_time_15min, r.origin, r.dest, r.platform];
+  out.sort((x, y) => {
+    const a = keyOf(x), b = keyOf(y);
+    for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return a[i] < b[i] ? -1 : 1;
+    return x.booked_fare_sgd - y.booked_fare_sgd;
+  });
+
   counts.published = out.length;
   return { rows: out, counts };
 }

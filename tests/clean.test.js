@@ -45,6 +45,15 @@ test("a station with no region is an error, not a silent leak", () => {
   assert.throws(() => cleanMonth([ride("Nowhere", "Bugis", "2026-12-01T10:00", 10)], regions), /no region for: Nowhere/);
 });
 
+test("published rows follow ride time, not submission order", () => {
+  const late = ride("Tampines", "City Hall", "2026-12-05T09:00", 21);
+  const early = ride("Tampines", "City Hall", "2026-12-01T07:00", 24);
+  const { rows: out } = cleanMonth([...rows, late, early], regions);
+  const times = out.map((r) => r.ride_time_15min);
+  assert.deepEqual(times, [...times].sort());
+  assert.equal(out[0].ride_time_15min, "2026-12-01T07:00");
+});
+
 test("CSV quoting and empty values", () => {
   const csv = toCsv([{ origin: 'A, "B"', dest: "C", location_level: "station", rain: null }]);
   assert.equal(csv.split("\n")[1], '"A, ""B""",C,station,,,,,,,');

@@ -99,6 +99,8 @@ Each submission stores the two stations, the ride time rounded down to 15 minute
 
 Nothing else is stored: no account, phone number, name, device ID, IP address, location or exact time. The IP address is used only for the rate limit and is not saved. Location is read only when you press the button and stays in the browser. Submissions are not live yet; the Worker has not been deployed.
 
+The monthly public file has no record ID. Its rows are sorted by ride time, so the order does not show who submitted first. A station pair with fewer than 5 rides that month is shown by region instead of station.
+
 ## Licence
 
 Code: [MIT](LICENSE). Published fare data will be released under CC BY 4.0.
