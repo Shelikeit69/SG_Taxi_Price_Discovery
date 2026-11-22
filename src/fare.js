@@ -5,8 +5,9 @@
 //                  + location surcharge + city surcharge
 //
 // Waiting time is not measured. It is estimated as a share of the distance
-// charge: 10% off-peak, 20% at peak. The late-night share (10%) is an
-// assumption that has not been confirmed yet.
+// charge: 10% off-peak, 20% at peak, 10% late night. All three are
+// assumptions to be calibrated against street-hail records; no public data
+// gives the waiting share. Late night kept at 10% (decided 2026-11-22).
 //
 // All money is computed in integers and rounded to the cent only at the end,
 // so results match the hand-worked examples exactly.
