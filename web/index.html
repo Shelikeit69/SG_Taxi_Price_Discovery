@@ -28,11 +28,13 @@
   label.check input { width: auto; min-height: 0; }
   details { font-size: 0.9rem; }
   .ok { color: #2f6b2f; }
+  .top { display: flex; justify-content: space-between; align-items: center; gap: 0.75rem; }
+  button.lang { width: auto; min-height: 2.25rem; padding: 0.25rem 0.75rem; font-size: 0.9rem; flex-shrink: 0; }
 </style>
 </head>
 <body>
 <main>
-  <h1 id="title"></h1>
+  <div class="top"><h1 id="title"></h1><button type="button" id="langBtn" class="lang"></button></div>
   <p id="intro" class="muted"></p>
   <form id="form" novalidate>
     <label><span id="fromLabel"></span><select id="origin"></select></label>

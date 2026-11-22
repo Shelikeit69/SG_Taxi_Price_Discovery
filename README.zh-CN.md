@@ -30,7 +30,7 @@
 | `src/fare.js` | 按道路距离、时间和起点站算标准价 |
 | `tests/fare.test.js` | 标准价测试，含下面的试算例子 |
 | `src/route.js` | 找最近的站；路线在手机上保存 6 小时 |
-| `src/text.js` | 页面上的全部文字 |
+| `src/text.js` | 页面上的全部文字，中英两套；页面默认跟随浏览器语言，可一键切换。两种语言的条目对不上时，测试会失败 |
 | `web/` | 计算页（需要 `web/data/stations.json` 和 `web/data/distances.json`，不提交进仓库） |
 | `src/stations.js`、`scripts/build_stations.js` | 用 LTA 地铁站出口 GeoJSON（data.gov.sg，新加坡开放数据许可 1.0 版）生成 `web/data/stations.json`；含地铁站和轻轨站，同名换乘站合并为一个 |
 | `db/schema.sql` | 存放提交记录的数据表（Cloudflare D1） |

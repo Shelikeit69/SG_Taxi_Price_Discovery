@@ -14,6 +14,8 @@
   let distances = {};
 
   function setText() {
+    document.documentElement.lang = lang === "zh" ? "zh-Hans" : "en";
+    $("langBtn").textContent = TEXT.langSwitch;
     document.title = TEXT.title;
     $("title").textContent = TEXT.title;
     $("intro").textContent = TEXT.intro;
@@ -33,6 +35,7 @@
     $("submitTitle").textContent = TEXT.submitTitle;
     $("submitIntro").textContent = TEXT.submitIntro;
     $("platformLabel").textContent = TEXT.platform;
+    const platformValue = $("platform").value;
     const choose = document.createElement("option");
     choose.value = "";
     choose.textContent = TEXT.choosePlatform;
@@ -42,6 +45,7 @@
       o.textContent = label;
       return o;
     }));
+    $("platform").value = platformValue;
     $("streetHailHint").textContent = TEXT.streetHailHint;
     $("bookedFareLabel").textContent = TEXT.bookedFare;
     $("discountLabel").textContent = TEXT.discount;
@@ -209,8 +213,32 @@
     distances = d.metres;
   }
 
-  async function start() {
+  // Switch language in place: keep every choice the user made, redraw the text.
+  function switchLang() {
+    setLang(lang === "zh" ? "en" : "zh");
+    if (storage) {
+      try {
+        storage.setItem(LANG_KEY, lang);
+      } catch {}
+    }
     setText();
+    for (const id of ["origin", "dest"]) if ($(id).options.length) $(id).options[0].textContent = TEXT.choose;
+    $("status").textContent = "";
+    $("submitStatus").textContent = "";
+    if (stations.length) {
+      render(false);
+      rideTimeNote();
+    }
+  }
+
+  async function start() {
+    let savedLang = null;
+    try {
+      savedLang = storage ? storage.getItem(LANG_KEY) : null;
+    } catch {}
+    setLang(pickLang(savedLang, navigator.languages || [navigator.language]));
+    setText();
+    $("langBtn").addEventListener("click", switchLang);
     const now = singaporeTime();
     $("time").value = now.time;
     $("day").value = now.day;
