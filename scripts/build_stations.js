@@ -17,4 +17,4 @@ if (!input || !output) {
 }
 const stations = stationsFromExits(JSON.parse(fs.readFileSync(input, "utf8")));
 fs.writeFileSync(output, JSON.stringify(stations, null, 1) + "\n");
-console.log(`${stations.length} MRT stations written to ${output}`);
+console.log(`${stations.length} MRT/LRT stations written to ${output}`);
