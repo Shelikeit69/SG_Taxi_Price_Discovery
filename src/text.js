@@ -2,10 +2,17 @@
 // the same keys; tests/text.test.js checks that, so a change to one language
 // without the other fails CI. Station names stay in English (official names).
 
+// Fare page linked from the intro (rates checked 2026-11-21).
+const FARES_URL = "https://www.cdgtaxi.com.sg/fares/";
+
 const TEXTS = {
   en: {
-    title: "Singapore taxi reference fare",
-    intro: "Pick two MRT/LRT stations. The page works out the street-hail meter fare from published ComfortDelGro rates. Compare it with your ride-hailing quote.",
+    title: "Singapore taxi fare reference",
+    intro: {
+      before: "Pick the stations nearest your start and end. The page works out the fare for a regular taxi hailed on the street, from the rates ",
+      link: "ComfortDelGro",
+      after: " publishes. Compare it with the quote in the ride-hailing app you use most.",
+    },
     from: "From",
     to: "To",
     choose: "Choose a station",
@@ -18,7 +25,7 @@ const TEXTS = {
     time: "Time",
     day: "Day",
     weekday: "Weekday",
-    weekend: "Weekend or public holiday",
+    weekend: "Weekend/PH",
     result: "Reference fare",
     pickBoth: "Pick a start and an end station.",
     sameStation: "Start and end are the same station.",
@@ -64,8 +71,12 @@ const TEXTS = {
     sentenceGap: " ",
   },
   zh: {
-    title: "新加坡德士参考车费",
-    intro: "选两个地铁站或轻轨站，页面会按 ComfortDelGro 公布的费率，算出路边拦德士的跑表车费。拿它对照打车 App 的报价。",
+    title: "新加坡打车正常参考价",
+    intro: {
+      before: "选离起点和终点最近的两个站，页面会按 ",
+      link: "ComfortDelGro",
+      after: " 公布的费率算出在路边直接拦普通德士的车费。拿它对照你最常用的打车 App 的报价。",
+    },
     from: "起点",
     to: "终点",
     choose: "选择站点",
@@ -76,7 +87,7 @@ const TEXTS = {
     locateDenied: "定位已关闭或被拒绝，请从列表里选起点站。",
     locateUnavailable: "这个浏览器用不了定位，请从列表里选起点站。",
     time: "时间",
-    day: "日子",
+    day: "工作日还是周末/假期",
     weekday: "工作日",
     weekend: "周末或公众假期",
     result: "参考车费",
@@ -183,4 +194,4 @@ function setLang(l) {
   return lang;
 }
 
-if (typeof module !== "undefined") module.exports = { TEXTS, PLACE, premiumPct, money, formatDistance, surchargeNote, pickLang, setLang, LANG_KEY, get TEXT() { return TEXT; } };
+if (typeof module !== "undefined") module.exports = { TEXTS, FARES_URL, PLACE, premiumPct, money, formatDistance, surchargeNote, pickLang, setLang, LANG_KEY, get TEXT() { return TEXT; } };
