@@ -2,7 +2,7 @@
 const test = require("node:test");
 const assert = require("node:assert/strict");
 const text = require("../src/text.js");
-const { money, formatDistance, surchargeNote, TEXTS, PLACE, pickLang, setLang } = text;
+const { money, formatDistance, surchargeNote, TEXTS, PLACE, pickLang, setLang, premiumPct } = text;
 const TEXT = TEXTS.en;
 const { fare } = require("../src/fare.js");
 
@@ -43,7 +43,8 @@ function shape(v) {
 test("English and Chinese text have the same shape", () => {
   assert.deepEqual(shape(TEXTS.zh), shape(TEXTS.en));
   assert.deepEqual(Object.keys(PLACE.zh).sort(), Object.keys(PLACE.en).sort());
-  for (const v of Object.values(TEXTS.zh)) if (typeof v === "string") assert.ok(v.trim().length > 0);
+  // sentenceGap is meant to be empty in Chinese; every other string must have text.
+  for (const [k, v] of Object.entries(TEXTS.zh)) if (typeof v === "string" && k !== "sentenceGap") assert.ok(v.trim().length > 0, k);
 });
 
 test("language choice: saved choice first, then the browser language", () => {
@@ -65,4 +66,19 @@ test("Chinese surcharge note uses the Chinese place name", () => {
   } finally {
     setLang("en");
   }
+});
+
+test("premium after submitting", () => {
+  assert.equal(premiumPct(20.5, 17.37), 18);
+  assert.equal(premiumPct(16, 17.37), -8);
+  assert.equal(premiumPct(17.4, 17.37), 0);
+  assert.equal(premiumPct(17.3, 17.37), 0);
+  assert.equal(Object.is(premiumPct(17.3, 17.37), -0), false);
+  assert.equal(premiumPct(20, null), null);
+  assert.equal(premiumPct(20, 0), null);
+  assert.equal(TEXTS.en.premium(18), "This booking is 18% above the reference fare.");
+  assert.equal(TEXTS.en.premium(-8), "This booking is 8% below the reference fare.");
+  assert.equal(TEXTS.zh.premium(18), "这单比参考车费高 18%。");
+  assert.equal(TEXTS.zh.premium(-8), "这单比参考车费低 8%。");
+  assert.equal(TEXTS.zh.premium(0), "这单和参考车费差不多。");
 });

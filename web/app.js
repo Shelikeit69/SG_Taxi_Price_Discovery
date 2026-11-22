@@ -58,7 +58,7 @@
 
   function rideTimeNote() {
     const t = $("time").value;
-    $("rideTimeNote").textContent = fromSavedRoute ? TEXT.rideTimeNote(checkDate, t) : TEXT.noSavedRoute + " " + TEXT.rideTimeNote(checkDate, t);
+    $("rideTimeNote").textContent = fromSavedRoute ? TEXT.rideTimeNote(checkDate, t) : TEXT.noSavedRoute + TEXT.sentenceGap + TEXT.rideTimeNote(checkDate, t);
   }
 
   async function submit(e) {
@@ -88,7 +88,13 @@
       });
       if (res.status === 201) {
         if (storage) clearRoute(storage);
-        status.textContent = TEXT.submitted;
+        let reference = null;
+        try {
+          reference = (await res.json()).benchmark;
+        } catch {}
+        // Compare with the reference fare the server worked out for the saved record.
+        const pct = premiumPct(Number(payload.bookedFare), reference);
+        status.textContent = pct === null ? TEXT.submitted : TEXT.submitted + TEXT.sentenceGap + TEXT.premium(pct);
         status.className = "ok";
         $("bookedFare").value = "";
         $("discount").checked = false;

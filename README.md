@@ -10,7 +10,7 @@ The reference fare comes only from public rates. It is an estimate, not a quote.
 
 ## Status
 
-Early development. The fare formula and data design are settled, and the fare calculation module is written and tested. A first version of the fare page is in `web/`; it still needs the station list and the station-to-station distance table, which are not built yet. The table schema, the submission checks and the server-side submission handler are written and tested; so are the submission form and the Worker entry point. Deployment is not done yet.
+Early development. The fare formula and data design are settled, and the fare calculation module is written and tested. The fare page is in `web/`, in English and Chinese. Its station list (184 MRT and LRT stations) is built from LTA open data; the station-to-station road distance table is not built yet. The table schema, the submission checks, the server-side submission handler, the submission form and the Worker entry point are written and tested. After submitting, the page shows how far the booked price is from the reference fare. Deployment is not done yet.
 
 What is in the repository today:
 
