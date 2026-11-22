@@ -25,6 +25,8 @@ function reply(status, body) {
 // deps:
 //   stations:  Set of station names
 //   metres(origin, dest): road distance in metres, or undefined
+//   distanceVersion: version of the distance table; stored with the rate version
+//                    in formula_version as "<rates>+<distances>"
 //   uuid():    random id
 //   holidays:  optional Set of "YYYY-MM-DD" public holidays (empty until wired in)
 // env:
@@ -83,7 +85,7 @@ async function handleSubmit(request, env, deps) {
     comparison = null;
   }
 
-  const row = { id: deps.uuid(), ...r, benchmark_sgd: benchmark, formula_version: RATES.version, rain_mm: null };
+  const row = { id: deps.uuid(), ...r, benchmark_sgd: benchmark, formula_version: deps.distanceVersion ? `${RATES.version}+${deps.distanceVersion}` : RATES.version, rain_mm: null };
   await env.DB.prepare(
     "INSERT INTO rides (id, origin_station, dest_station, ride_time_15min, platform, booked_fare_sgd, discount_flag, benchmark_sgd, formula_version, rain_mm) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
   )

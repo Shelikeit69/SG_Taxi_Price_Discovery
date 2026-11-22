@@ -36,6 +36,7 @@
     // Sentences with one outside link, built from nodes (no innerHTML).
     linked($("intro"), TEXT.intro, FARES_URL);
     linked($("destHint"), TEXT.destHint, ONEMAP_URL);
+    $("distanceNotice").textContent = TEXT.placeholderNotice;
     $("fromLabel").textContent = TEXT.from;
     $("toLabel").textContent = TEXT.to;
     $("locate").textContent = TEXT.locate;
@@ -241,6 +242,8 @@
     ]);
     stations = s;
     distances = d.metres;
+    // Placeholder distances (straight line x 1.3): say so at the top of the page.
+    $("distanceNotice").hidden = !isPlaceholderDistances(d);
   }
 
   // Switch language in place: keep every choice the user made, redraw the text.
