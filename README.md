@@ -32,7 +32,7 @@ What is in the repository today:
 | `src/rain.js` | Matches a ride to the nearest rain gauge in data.gov.sg rainfall readings |
 | `worker/rainjob.js` | Hourly job that fills the rain flag for rides whose time slot has ended |
 | `src/clean.js`, `scripts/monthly_export.js` | Monthly cleaning and the public CSV with its summary |
-| `src/typical.js` | Phase two: typical price-to-reference ratio by platform, time band and rain |
+| `src/typical.js` | Phase two: typical price-to-reference ratio by platform, time band and rain; rides with a discount are left out by default and counted separately |
 | `scripts/build_data.py` | Turns station, line and coastline data into a compact JSON file for the map |
 | `scripts/page_template.html` | Template for the surcharge map page (Leaflet) |
 | `scripts/build_page.py` | Fills the template and writes a single self-contained HTML page |
