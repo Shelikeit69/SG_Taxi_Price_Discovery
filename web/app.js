@@ -71,8 +71,11 @@
     $("submitBtn").textContent = TEXT.submit;
   }
 
+  // Shows the time as it will be stored: rounded down to 15 minutes by the same
+  // roundDown15 the server uses (src/submission.js).
   function rideTimeNote() {
-    const t = $("time").value;
+    const slot = roundDown15(`${checkDate}T${$("time").value}`);
+    const t = slot ? slot.slice(11) : $("time").value;
     $("rideTimeNote").textContent = fromSavedRoute ? TEXT.rideTimeNote(checkDate, t) : TEXT.noSavedRoute + TEXT.sentenceGap + TEXT.rideTimeNote(checkDate, t);
   }
 
