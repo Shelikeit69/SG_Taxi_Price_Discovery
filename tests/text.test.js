@@ -104,7 +104,7 @@ test("intro links ComfortDelGro to the CDG fare page in both languages", () => {
 test("destination hint links OneMap for a postcode search, in both languages", () => {
   assert.equal(text.ONEMAP_URL, "https://www.onemap.sg/");
   const zh = TEXTS.zh.destHint;
-  assert.equal(zh.before + zh.link + zh.after, "不知道终点附近是哪个站？在 OneMap 里输入邮编查一下。");
+  assert.equal(zh.before + zh.link + zh.after, "不知道终点附近是哪个站？在 OneMap 里输入邮编，看 Nearby 里的 MRT Station。");
   const en = TEXTS.en.destHint;
-  assert.equal(en.before + en.link + en.after, "Not sure which station is near your destination? Search the postcode on OneMap.");
+  assert.equal(en.before + en.link + en.after, "Not sure which station is near your destination? Search the postcode on OneMap and check MRT Station under Nearby.");
 });
