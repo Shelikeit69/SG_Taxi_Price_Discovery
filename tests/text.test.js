@@ -82,3 +82,8 @@ test("premium after submitting", () => {
   assert.equal(TEXTS.zh.premium(-8), "这单比参考车费低 8%。");
   assert.equal(TEXTS.zh.premium(0), "这单和参考车费差不多。");
 });
+
+test("comparison sentence states the sample size and that rain is not considered", () => {
+  assert.equal(TEXTS.en.comparison(12, 25), "Of 12 earlier rides on the same platform in the same time band (rain not considered), 25% were cheaper relative to the reference fare.");
+  assert.equal(TEXTS.zh.comparison(12, 25), "同平台、同时段的 12 条记录里（不分是否下雨），有 25% 比这单划算（按与参考车费的比例算）。");
+});

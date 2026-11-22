@@ -64,3 +64,20 @@ test("rain comes from millimetres: 0.2 mm counts, the threshold can be raised", 
   const raised = typicalRatios(rows, { rainThresholdMm: 1 });
   assert.deepEqual(raised.map((g) => [g.rain, g.n]).sort(), [[0, 10], [1, 10]]);
 });
+
+const { submitComparison } = require("../src/typical.js");
+
+test("submitComparison: strictly lower ratios, ties not counted as cheaper", () => {
+  const rows = Array.from({ length: 10 }, () => ({ booked_fare_sgd: 30, benchmark_sgd: 20, ride_time_15min: "2026-11-24T18:00", discount_flag: 0 }));
+  assert.deepEqual(submitComparison({ ratio: 1.5, band: "peak", discount: false }, rows), { n: 10, cheaperPct: 0 });
+  assert.deepEqual(submitComparison({ ratio: 1.51, band: "peak", discount: false }, rows), { n: 10, cheaperPct: 100 });
+  assert.equal(submitComparison({ ratio: 1.51, band: "peak", discount: true }, rows), null);
+  assert.equal(submitComparison({ ratio: 1.51, band: "offpeak", discount: false }, rows), null);
+});
+
+test("submitComparison: public holidays follow the holiday list", () => {
+  // 2026-12-25 (Friday) 11:00: weekday off-peak, or weekend peak if listed as a holiday.
+  const rows = Array.from({ length: 10 }, () => ({ booked_fare_sgd: 20, benchmark_sgd: 20, ride_time_15min: "2026-12-25T11:00", discount_flag: 0 }));
+  assert.equal(submitComparison({ ratio: 2, band: "peak", discount: false }, rows), null);
+  assert.equal(submitComparison({ ratio: 2, band: "peak", discount: false }, rows, new Set(["2026-12-25"])).n, 10);
+});

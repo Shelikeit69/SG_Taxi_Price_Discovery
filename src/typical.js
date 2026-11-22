@@ -73,4 +73,32 @@ function typicalRatios(rows, options = {}) {
   return out.sort((a, b) => (a.platform + a.band + a.rain).localeCompare(b.platform + b.band + b.rain));
 }
 
-if (typeof module !== "undefined") module.exports = { MIN_SHOWN, MIN_NORMAL, band, quantile, typicalRatios };
+// Second line of the after-submit feedback (decided 2026-11-22, option A).
+// Compares this ride's premium ratio with earlier rides on the same platform
+// in the same time band. Rain is NOT considered: at submit time the ride's
+// rain_mm is not matched yet, so rides with and without rain are mixed, and
+// rides whose rain_mm is still empty count too. Rides with a discount are left
+// out, and a ride that itself used a discount gets no comparison.
+// Returns { n, cheaperPct } once at least MIN_SHOWN comparison rides exist,
+// otherwise null. cheaperPct = share of comparison rides with a strictly lower
+// ratio, as a whole percent, so the page can say "pricier than Y% of them".
+//
+// ride:  { ratio, band, discount }  (band from the ride's own day type)
+// rows:  earlier rows of the same platform: { booked_fare_sgd, benchmark_sgd, ride_time_15min, discount_flag }
+// holidays: Set of "YYYY-MM-DD"; until the public holiday list is wired in,
+//           rides on public holidays are grouped as weekdays.
+function submitComparison(ride, rows, holidays = new Set()) {
+  if (ride.discount || !(ride.ratio > 0)) return null;
+  let n = 0;
+  let cheaper = 0;
+  for (const r of rows) {
+    if (r.discount_flag === 1 || !(r.benchmark_sgd > 0)) continue;
+    if (band(r.ride_time_15min, holidays) !== ride.band) continue;
+    n += 1;
+    if (r.booked_fare_sgd / r.benchmark_sgd < ride.ratio) cheaper += 1;
+  }
+  if (n < MIN_SHOWN) return null;
+  return { n, cheaperPct: Math.round((cheaper / n) * 100) };
+}
+
+if (typeof module !== "undefined") module.exports = { MIN_SHOWN, MIN_NORMAL, band, quantile, typicalRatios, submitComparison };

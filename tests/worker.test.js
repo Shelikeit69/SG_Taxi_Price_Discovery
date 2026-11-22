@@ -9,7 +9,7 @@ const data = {
 };
 
 function fakeDB(rows) {
-  return { prepare: () => ({ bind: (...a) => ({ run: async () => rows.push(a) }) }) };
+  return { prepare: () => ({ bind: (...a) => ({ run: async () => rows.push(a), all: async () => ({ results: [] }) }) }) };
 }
 
 test("routes /api/submit and returns 404 elsewhere", async () => {
