@@ -4,6 +4,8 @@
 
 // Fare page linked from the intro (rates checked 2026-11-21).
 const FARES_URL = "https://www.cdgtaxi.com.sg/fares/";
+// National map by SLA; SLA says pages may hyperlink to it at this address.
+const ONEMAP_URL = "https://www.onemap.sg/";
 
 const TEXTS = {
   en: {
@@ -15,6 +17,7 @@ const TEXTS = {
     },
     from: "From",
     to: "To",
+    destHint: { before: "Not sure which station is near your destination? Search the postcode on ", link: "OneMap", after: "." },
     choose: "Choose a station",
     choosePlatform: "Choose a platform",
     locate: "Use my location for the nearest station",
@@ -79,6 +82,7 @@ const TEXTS = {
     },
     from: "起点",
     to: "终点",
+    destHint: { before: "不知道终点附近是哪个站？在 ", link: "OneMap", after: " 里输入邮编查一下。" },
     choose: "选择站点",
     choosePlatform: "选择平台",
     locate: "用定位找最近的站",
@@ -194,4 +198,4 @@ function setLang(l) {
   return lang;
 }
 
-if (typeof module !== "undefined") module.exports = { TEXTS, FARES_URL, PLACE, premiumPct, money, formatDistance, surchargeNote, pickLang, setLang, LANG_KEY, get TEXT() { return TEXT; } };
+if (typeof module !== "undefined") module.exports = { TEXTS, FARES_URL, ONEMAP_URL, PLACE, premiumPct, money, formatDistance, surchargeNote, pickLang, setLang, LANG_KEY, get TEXT() { return TEXT; } };
