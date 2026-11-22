@@ -15,12 +15,17 @@
 
   // Fills el with parts.before, a link opening url in a new tab, parts.after.
   function linked(el, parts, url) {
+    el.replaceChildren(parts.before, newTabLink(parts.link, url), parts.after);
+  }
+
+  // A link that opens url in a new tab.
+  function newTabLink(text, url) {
     const a = document.createElement("a");
     a.href = url;
     a.target = "_blank";
     a.rel = "noopener";
-    a.textContent = parts.link;
-    el.replaceChildren(parts.before, a, parts.after);
+    a.textContent = text;
+    return a;
   }
 
   function setText() {
@@ -61,10 +66,8 @@
     $("streetHailHint").textContent = TEXT.streetHailHint;
     $("bookedFareLabel").textContent = TEXT.bookedFare;
     $("discountLabel").textContent = TEXT.discount;
-    $("consent").textContent = TEXT.consent;
-    $("storedTitle").textContent = TEXT.storedTitle;
-    $("stored").textContent = TEXT.stored;
-    $("notStored").textContent = TEXT.notStored;
+    const c = TEXT.consent;
+    $("consent").replaceChildren(c.before, newTabLink(c.licence, LICENCE_URL[lang]), c.middle, newTabLink(c.privacy, PRIVACY_URL[lang]), c.after);
     $("submitBtn").textContent = TEXT.submit;
   }
 
