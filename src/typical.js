@@ -7,10 +7,12 @@
 //
 // Working choices, not yet confirmed:
 // - the range is the 25th to 75th percentile;
-// - rides whose rain flag is still empty are left out until it is filled;
+// - rain_mm becomes rain / no rain with isRain() (at least 0.2 mm); rides whose
+//   rain_mm is still empty are left out until it is filled;
 // - weekends come from the date; public holidays must be passed in.
 
 const S = typeof module !== "undefined" ? require("./surcharge.js") : { mult };
+const RAIN = typeof module !== "undefined" ? require("./rain.js") : { isRain };
 
 const MIN_SHOWN = 10;
 const MIN_NORMAL = 30;
@@ -34,7 +36,8 @@ function quantile(sorted, q) {
 
 const round3 = (x) => Math.round(x * 1000) / 1000;
 
-// rows: database rows; options.holidays: array of "YYYY-MM-DD".
+// rows: database rows; options.holidays: array of "YYYY-MM-DD";
+// options.rainThresholdMm: overrides the 0.2 mm rain threshold.
 // Rides with a voucher or subscription discount (discount_flag = 1) are left
 // out by default: a discount is personal, not the platform's price for
 // everyone. Each group reports how many were left out (discountedLeftOut).
@@ -43,9 +46,10 @@ function typicalRatios(rows, options = {}) {
   const holidays = new Set(options.holidays || []);
   const groups = new Map();
   for (const r of rows) {
-    if (r.rain !== 0 && r.rain !== 1) continue;
+    const rain = RAIN.isRain(r.rain_mm, options.rainThresholdMm);
+    if (rain === null) continue;
     if (!(r.benchmark_sgd > 0)) continue;
-    const key = `${r.platform}|${band(r.ride_time_15min, holidays)}|${r.rain}`;
+    const key = `${r.platform}|${band(r.ride_time_15min, holidays)}|${rain}`;
     if (!groups.has(key)) groups.set(key, { ratios: [], discountedLeftOut: 0 });
     const g = groups.get(key);
     if (r.discount_flag === 1 && !options.includeDiscounted) g.discountedLeftOut += 1;

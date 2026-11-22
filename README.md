@@ -30,9 +30,9 @@ What is in the repository today:
 | `worker/app.js`, `worker/index.mjs` | Worker routing and entry point; the entry bundles `web/data/` at deploy time |
 | `wrangler.toml.example` | Worker config template; the real `wrangler.toml` with the database ID is not committed |
 | `src/rain.js` | Matches a ride to the nearest rain gauge in data.gov.sg rainfall readings |
-| `worker/rainjob.js` | Hourly job that fills the rain flag for rides whose time slot has ended |
+| `worker/rainjob.js` | Hourly job that fills `rain_mm` (millimetres at the nearest rain gauge over the 15-minute slot) for rides whose slot has ended |
 | `src/clean.js`, `scripts/monthly_export.js` | Monthly cleaning and the public CSV with its summary |
-| `src/typical.js` | Phase two: typical price-to-reference ratio by platform, time band and rain; rides with a discount are left out by default and counted separately |
+| `src/typical.js` | Phase two: typical price-to-reference ratio by platform, time band and rain (at least 0.2 mm counts as rain); rides with a discount are left out by default and counted separately |
 | `scripts/build_data.py` | Turns station, line and coastline data into a compact JSON file for the map |
 | `scripts/page_template.html` | Template for the surcharge map page (Leaflet) |
 | `scripts/build_page.py` | Fills the template and writes a single self-contained HTML page |
@@ -95,7 +95,7 @@ Open `build/index.html` in a browser.
 
 ## Privacy
 
-Each submission stores the two stations, the ride time rounded down to 15 minutes, the platform, the booked price and an optional discount flag. The server adds the reference fare, the rate-table version and, later, a rain flag. The table is in `db/schema.sql`.
+Each submission stores the two stations, the ride time rounded down to 15 minutes, the platform, the booked price and an optional discount flag. The server adds the reference fare, the rate-table version and, later, the rainfall in millimetres at the nearest public rain gauge. The table is in `db/schema.sql`.
 
 Nothing else is stored: no account, phone number, name, device ID, IP address, location or exact time. The IP address is used only for the rate limit and is not saved. Location is read only when you press the button and stays in the browser. Submissions are not live yet; the Worker has not been deployed.
 

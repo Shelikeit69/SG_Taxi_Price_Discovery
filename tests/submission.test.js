@@ -53,14 +53,14 @@ test("schema accepts a checked record and rejects bad rows", () => {
   const db = new DatabaseSync(":memory:");
   db.exec(fs.readFileSync(path.join(__dirname, "..", "db", "schema.sql"), "utf8"));
   const insert = db.prepare(
-    "INSERT INTO rides VALUES (:id, :origin_station, :dest_station, :ride_time_15min, :platform, :booked_fare_sgd, :discount_flag, :benchmark_sgd, :formula_version, :rain)"
+    "INSERT INTO rides VALUES (:id, :origin_station, :dest_station, :ride_time_15min, :platform, :booked_fare_sgd, :discount_flag, :benchmark_sgd, :formula_version, :rain_mm)"
   );
   const { record } = checkSubmission(good, names);
-  const row = { id: "r1", ...record, benchmark_sgd: 23.17, formula_version: "2026-11-21", rain: null };
+  const row = { id: "r1", ...record, benchmark_sgd: 23.17, formula_version: "2026-11-21", rain_mm: null };
   insert.run(row);
   assert.equal(db.prepare("SELECT COUNT(*) AS n FROM rides").get().n, 1);
   assert.throws(() => insert.run({ ...row, id: "r2", ride_time_15min: "2026-11-22T18:07" }));
   assert.throws(() => insert.run({ ...row, id: "r3", platform: "uber" }));
   assert.throws(() => insert.run({ ...row, id: "r4", dest_station: "Tampines" }));
-  assert.throws(() => insert.run({ ...row, id: "r5", rain: 2 }));
+  assert.throws(() => insert.run({ ...row, id: "r5", rain_mm: -1 }));
 });

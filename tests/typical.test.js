@@ -18,7 +18,7 @@ test("quantiles", () => {
 });
 
 const ride = (platform, slot, booked, extra = {}) => ({
-  platform, ride_time_15min: slot, booked_fare_sgd: booked, benchmark_sgd: 20, rain: 0, discount_flag: 0, ...extra,
+  platform, ride_time_15min: slot, booked_fare_sgd: booked, benchmark_sgd: 20, rain_mm: 0, discount_flag: 0, ...extra,
 });
 
 test("thresholds: under 10 hidden, 10-29 preliminary, 30+ normal", () => {
@@ -39,9 +39,9 @@ test("thresholds: under 10 hidden, 10-29 preliminary, 30+ normal", () => {
 
 test("rain splits groups; unmatched rain left out; discounts left out by default", () => {
   const rows = [
-    ...Array.from({ length: 10 }, () => ride("grab", "2026-11-23T12:00", 20, { rain: 1 })),
-    ...Array.from({ length: 10 }, () => ride("grab", "2026-11-23T12:00", 22, { rain: 0, discount_flag: 1 })),
-    ride("grab", "2026-11-23T12:00", 99, { rain: null }),
+    ...Array.from({ length: 10 }, () => ride("grab", "2026-11-23T12:00", 20, { rain_mm: 1.2 })),
+    ...Array.from({ length: 10 }, () => ride("grab", "2026-11-23T12:00", 22, { rain_mm: 0, discount_flag: 1 })),
+    ride("grab", "2026-11-23T12:00", 99, { rain_mm: null }),
   ];
   const byRain = (gs, rain) => gs.find((g) => g.rain === rain);
   const dflt = typicalRatios(rows);
@@ -53,4 +53,14 @@ test("rain splits groups; unmatched rain left out; discounts left out by default
   assert.equal(byRain(dflt, 0).discountedLeftOut, 10);
   const all = typicalRatios(rows, { includeDiscounted: true });
   assert.ok(all.every((g) => g.n === 10 && g.discountedLeftOut === 0));
+});
+
+test("rain comes from millimetres: 0.2 mm counts, the threshold can be raised", () => {
+  const rows = [
+    ...Array.from({ length: 10 }, () => ride("grab", "2026-11-23T12:00", 20, { rain_mm: 0.2 })),
+    ...Array.from({ length: 10 }, () => ride("grab", "2026-11-23T12:00", 20, { rain_mm: 2.4 })),
+  ];
+  assert.deepEqual(typicalRatios(rows).map((g) => [g.rain, g.n]), [[1, 20]]);
+  const raised = typicalRatios(rows, { rainThresholdMm: 1 });
+  assert.deepEqual(raised.map((g) => [g.rain, g.n]).sort(), [[0, 10], [1, 10]]);
 });

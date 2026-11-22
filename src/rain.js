@@ -7,11 +7,13 @@
 //                          data: [{ stationId, value }] }],
 //             readingUnit: "mm" } }
 //
-// A ride counts as rainy if the nearest gauge to the start station recorded
-// more than RAIN_THRESHOLD_MM in total over the ride's 15-minute slot.
-// The threshold (0 mm) is a working assumption and has not been confirmed.
+// Each ride stores rain_mm: the total at the gauge nearest the start station
+// over the ride's 15-minute slot. Whether that counts as "rain" is decided only
+// at analysis time, with RAIN_THRESHOLD_MM (decided 2026-11-22): at least
+// 0.2 mm, the smallest step of a tipping-bucket gauge and NEA's rain-day
+// threshold. Changing it later needs no re-fetch.
 
-const RAIN_THRESHOLD_MM = 0;
+const RAIN_THRESHOLD_MM = 0.2;
 const R = typeof module !== "undefined" ? require("./route.js") : { haversine };
 
 // station: { lat, lng }; gauges: data.stations from the API.
@@ -44,11 +46,19 @@ function slotTotal(slot, gaugeId, readings) {
   return { mm, count };
 }
 
-// Returns 1 (rain), 0 (no rain) or null (no readings for that gauge and slot).
-function rainFlag(slot, gaugeId, readings, threshold = RAIN_THRESHOLD_MM) {
+// Millimetres for the slot, rounded to 0.1 mm (readings come in 0.2 mm steps;
+// rounding removes floating-point noise), or null when the gauge has no
+// readings in that slot.
+function slotRainMm(slot, gaugeId, readings) {
   const { mm, count } = slotTotal(slot, gaugeId, readings);
   if (count === 0) return null;
-  return mm > threshold ? 1 : 0;
+  return Math.round(mm * 10) / 10;
+}
+
+// 1 (rain), 0 (no rain) or null (not matched). For analysis only.
+function isRain(mm, threshold = RAIN_THRESHOLD_MM) {
+  if (typeof mm !== "number") return null;
+  return mm + 1e-9 >= threshold ? 1 : 0;
 }
 
 // URL for one page of a day's readings. The API returns about 25 readings per
@@ -59,4 +69,4 @@ function dayUrl(date, paginationToken) {
   return paginationToken ? `${base}&paginationToken=${encodeURIComponent(paginationToken)}` : base;
 }
 
-if (typeof module !== "undefined") module.exports = { RAIN_THRESHOLD_MM, nearestGauge, slotTotal, rainFlag, dayUrl };
+if (typeof module !== "undefined") module.exports = { RAIN_THRESHOLD_MM, nearestGauge, slotTotal, slotRainMm, isRain, dayUrl };

@@ -1,7 +1,7 @@
-// Scheduled job: fills the rain column for rides whose 15-minute slot has ended.
-// Reads public rainfall data from data.gov.sg; stores only a 0/1 flag per ride.
+// Scheduled job: fills rain_mm for rides whose 15-minute slot has ended.
+// Reads public rainfall data from data.gov.sg; stores the slot's millimetres per ride.
 
-const { nearestGauge, rainFlag, dayUrl } = require("../src/rain.js");
+const { nearestGauge, slotRainMm, dayUrl } = require("../src/rain.js");
 
 const MAX_PAGES_PER_DAY = 40; // a day has 288 readings, about 12 pages
 const SLOT_MS = 15 * 60 * 1000;
@@ -36,7 +36,7 @@ async function fetchDay(fetchFn, date) {
 async function runRainJob(env, deps) {
   const cutoff = sgSlotString(deps.now - SLOT_MS); // slots starting at or before this have ended
   const { results } = await env.DB.prepare(
-    "SELECT id, origin_station, ride_time_15min FROM rides WHERE rain IS NULL AND ride_time_15min <= ? ORDER BY ride_time_15min LIMIT ?"
+    "SELECT id, origin_station, ride_time_15min FROM rides WHERE rain_mm IS NULL AND ride_time_15min <= ? ORDER BY ride_time_15min LIMIT ?"
   )
     .bind(cutoff, deps.limit || 200)
     .all();
@@ -64,12 +64,12 @@ async function runRainJob(env, deps) {
         continue;
       }
       const gauge = nearestGauge(at, day.gauges);
-      const flag = gauge ? rainFlag(r.ride_time_15min, gauge.id, day.readings) : null;
-      if (flag === null) {
+      const mm = gauge ? slotRainMm(r.ride_time_15min, gauge.id, day.readings) : null;
+      if (mm === null) {
         summary.noReading += 1;
         continue;
       }
-      await env.DB.prepare("UPDATE rides SET rain = ? WHERE id = ? AND rain IS NULL").bind(flag, r.id).run();
+      await env.DB.prepare("UPDATE rides SET rain_mm = ? WHERE id = ? AND rain_mm IS NULL").bind(mm, r.id).run();
       summary.updated += 1;
     }
   }
