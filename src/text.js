@@ -55,10 +55,12 @@ const TEXTS = {
     submit: "Submit",
     submitting: "Sending…",
     submitted: "Thanks. Your record was saved, and the route on this phone was cleared.",
+    premium: (pct) => (pct > 0 ? `This booking is ${pct}% above the reference fare.` : pct < 0 ? `This booking is ${-pct}% below the reference fare.` : "This booking is about the same as the reference fare."),
     submitFailed: "Could not save. Check the fields and try again.",
     rateLimited: "Too many submissions in a short time. Please wait a minute.",
     needRoute: "Pick a start and end station with a reference fare first.",
     langSwitch: "中文",
+    sentenceGap: " ",
   },
   zh: {
     title: "新加坡德士参考车费",
@@ -112,10 +114,12 @@ const TEXTS = {
     submit: "提交",
     submitting: "正在提交…",
     submitted: "谢谢，记录已保存，这部手机上的路线也已清除。",
+    premium: (pct) => (pct > 0 ? `这单比参考车费高 ${pct}%。` : pct < 0 ? `这单比参考车费低 ${-pct}%。` : "这单和参考车费差不多。"),
     submitFailed: "没能保存。请检查填写的内容，再试一次。",
     rateLimited: "短时间内提交太多次，请等一分钟再试。",
     needRoute: "请先选好起点和终点，算出参考车费。",
     langSwitch: "English",
+    sentenceGap: "",
   },
 };
 
@@ -136,6 +140,13 @@ const PLACE = {
 
 let lang = "en";
 let TEXT = TEXTS.en;
+
+// Whole-number percentage of the booked price above (+) or below (-) the reference fare.
+function premiumPct(booked, reference) {
+  if (!(booked > 0) || !(reference > 0)) return null;
+  const pct = Math.round((booked / reference - 1) * 100);
+  return pct === 0 ? 0 : pct; // no "-0"
+}
 
 function money(v) {
   return "$" + v.toFixed(2);
@@ -170,4 +181,4 @@ function setLang(l) {
   return lang;
 }
 
-if (typeof module !== "undefined") module.exports = { TEXTS, PLACE, money, formatDistance, surchargeNote, pickLang, setLang, LANG_KEY, get TEXT() { return TEXT; } };
+if (typeof module !== "undefined") module.exports = { TEXTS, PLACE, premiumPct, money, formatDistance, surchargeNote, pickLang, setLang, LANG_KEY, get TEXT() { return TEXT; } };
