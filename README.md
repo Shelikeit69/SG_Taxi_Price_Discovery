@@ -21,7 +21,7 @@ What is in the repository today:
 | `src/fare.js` | Reference fare from road distance, time and starting station |
 | `tests/fare.test.js` | Fare tests, including the worked example below |
 | `src/route.js` | Nearest station and the route saved on the phone for 6 hours |
-| `src/text.js` | All page text in one place |
+| `src/text.js` | All page text, in English and Chinese; the page follows the browser language and has a switch button. A test fails if the two languages fall out of step |
 | `web/` | Fare page (needs `web/data/stations.json` and `web/data/distances.json`, not committed) |
 | `src/stations.js`, `scripts/build_stations.js` | Builds `web/data/stations.json` from LTA's MRT Station Exit GeoJSON (data.gov.sg, Singapore Open Data Licence v1.0); MRT and LRT stations, same-name interchanges merged |
 | `db/schema.sql` | Database table for fare submissions (Cloudflare D1) |
